@@ -9,7 +9,7 @@ module.exports = function () {
     }
     var serverIp = "";
     if (package.serverIp != "") {
-        serverIp = ' --host ' + package.serverIp + '/';
+        serverIp = ' --host ' + package.serverIp;
     }
     //var option = 'webpack-dev-server --progress --colors --hot --inline ' + build + serverIp + ' --port ' + package.port + ' ';
     var option = 'webpack-dev-server ' + build + serverIp + ' --port ' + package.port + ' ';
