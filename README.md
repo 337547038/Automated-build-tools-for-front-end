@@ -7,7 +7,7 @@
 基于版本：
 Node.js 8.9.0
 webpack 3.8.1
-webpack-dev-server 3.8.1
+webpack-dev-server 2.9.4
 node-sass 4.6.0
 
 
@@ -16,13 +16,11 @@ node-sass 4.6.0
 
 首先需要安装node.js
 
-这是一个npm package,因没有上传到npm，这里需要手动将文件移至相对应的目录下，实现全局安装。
-
 1、全局安装webpack及webpack-dev-server，如不需要自动刷新（即运行guilin server命令），这步可以省略。命令：
    npm install -g webpack
    npm install -g webpack-dev-server
 
-2、添加phantomjs为系统变量环境（下载地址：http://phantomjs.org/）
+2、添加phantomjs为系统变量环境（ 下载地址：http://phantomjs.org/ ）
    下载并解压到任意目录如D:\phantomjs\phantomjs.exe，添加环境变量，我的电脑－>属性－>系统高级设置->环境变量－>系统变量里找到path，追加到后面。如果不需要动态加载模块，这步也可以省略。
 
    3、将文件夹guilin复制到以下路径C:\Users\当前用户名\AppData\Roaming\npm\node_modules，
@@ -31,6 +29,8 @@ node-sass 4.6.0
    4、最重要的一点：将目录下的guilin.cmd复制到以下目录C:\Users\当前用户名\AppData\Roaming\npm，才能使用下面的所有命令。
 
    目录下包含了static文件夹，guilin init初始化时会将目录下的文件复制到当前项目目录，因此可以将一些常用的脚本样式图片等放到对应的目录去，初始化时就不用再次复制了。
+
+   以上安装可参考使用说明.docx里的安装截图。
 
 ## 二、使用
 
@@ -58,7 +58,7 @@ node-sass 4.6.0
 
    3、guilin server
    简写为 guilin s
-   启动服务，执行后可在浏览器输入http://localhost:8080查看页面，修改了源文件会自动刷新页面。
+   启动服务，执行后可在浏览器输入 http://localhost:8080 查看页面，修改了源文件会自动刷新页面。
 
    4、guilin watch
    简写为 guilin w
@@ -68,7 +68,7 @@ node-sass 4.6.0
    简写 guilin m
    根据配置合并并压缩js，在打包时会执行此命令，建议build执行完后再独立执行合并压缩。
 
-   6、guilin imgToBase64
+   6、guilin imgtobase64
    简写 guilin t
    将css样式中的背景图片转为base64。需要在配置中设置imgToBase64为true。此命令没有与其它命令关联，需要转换图片时要单独执行才能转换。
 
@@ -78,7 +78,7 @@ node-sass 4.6.0
 - 一般情况无需配置，用默认的即可。
 - dist：编译生成目录，默认为空即为根目录test，如将文件打包到目录build，dist:”build”
 - port： 启动服务时的端口
-- serverIp： 用于访问的本机ip地址，开启server命令有效，不填写时只能通过http://localhost来访问。
+- serverIp： 用于访问的本机ip地址，开启server命令有效，不填写时只能通过 http://localhost 来访问。
 - inputPath：sass入口，默认为index.scss
 - outputStype：sass输出类型,可选nested，expanded，compact，compressed(默认)
 - outputPath：sass输出路径，默认为style.css
