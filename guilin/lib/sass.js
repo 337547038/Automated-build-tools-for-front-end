@@ -15,10 +15,10 @@ var sassNode = function (inputPath, outputStyle, outputPath, map, auto, type, ou
             console.log(err.message);
         } else {
             //css内容,输出路经,是否输出log,是否添加前缀,类型,是否生成地图
-            autoPreFixer(result.css.toString(), outputPath, true, auto, type, map);
+            autoPreFixer(result.css.toString(), outputPath, true, auto, type, map, inputPath);
             if (type == 'build') {
                 //打包时直接生成一份到打包后的目录
-                autoPreFixer(result.css.toString(), outputPath2, true, auto, type, map);
+                autoPreFixer(result.css.toString(), outputPath2, true, auto, type, map, inputPath);
             }
             if (map) {
                 writeFiles(result.map.toString(), outputPath + '.map', false);
@@ -62,19 +62,26 @@ module.exports = function (map, package, type) {
     }
 };
 
-function autoPreFixer(css, outPath, log, auto, type, map) {
+function autoPreFixer(css, outPath, log, auto, type, map, inputPath) {
     if (auto) {
         //编译后再将样式添加兼容前缀时会去掉map信息，watch时追加回去。（暂没找到配置办法）
         var sourceMap = '';
         if (type == 'watch' && map) {
             sourceMap = '/*# sourceMappingURL=' + outPath.replace('./src/css/', '') + '.map */';
         }
-        postcss([autoprefixer]).process(css).then(function (result) {
-            result.warnings().forEach(function (warn) {
-                console.warn(warn.toString());
+        /*postcss([autoprefixer]).process(css).then(function (result) {
+         result.warnings().forEach(function (warn) {
+         console.warn(warn.toString());
+         });
+         writeFiles(result.css + sourceMap, outPath, log)
+         });*/
+        postcss([autoprefixer])
+            .process(css, {from: inputPath, to: outPath})
+            .then(result => {
+                writeFiles(result.css + sourceMap, outPath, log);
+                //fs.writeFile('dest/app.css', result.css);
+                //if ( result.map ) fs.writeFile('dest/app.css.map', result.map);
             });
-            writeFiles(result.css + sourceMap, outPath, log)
-        });
     } else {
         writeFiles(css, outPath, log)
     }
