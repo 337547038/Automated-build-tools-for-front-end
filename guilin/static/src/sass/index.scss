@@ -1,1 +1,65 @@
 @charset "utf-8";
+//透明层，兼容ie7
+@mixin opacity($opacity:30) { opacity: $opacity/100; filter: alpha(opacity=$opacity); }
+//经常同时使用到的高及行高，使用如@include height(30px)
+@mixin height($h:30px) { height: $h; line-height: $h; }
+//浮动清除
+@mixin clear() { display: block; content: '.'; clear: both; height: 0; line-height: 0; visibility: hidden; }
+$global-font-family: Arial, "Microsoft YaHei", "simsun"; //全局字体
+html, body, div, span, table, tbody, tr, th, td, em, img, strong, h1, h2, h3, h4, h5, h6, p, a, dl, dd, dt, ol, ul, li, form, label, input, textarea, button, b, i, u{ margin: 0; padding: 0; list-style: none; outline: none; }
+h1, h2, h3, h4, h5, h6, b{ font-weight: 400; }
+a, img{ text-decoration: none; border: 0; }
+body{ font-family: $global-font-family; color: #666; background: #f5f5f5; font-size: 14px; }
+a{ color: #666; font-size: 14px;
+  &:link{ text-decoration: none; }
+  &:visited{ text-decoration: none; color: #666; }
+  &:hover{ text-decoration: none; color: #487eda; }
+  &:active{ text-decoration: none; color: #666; }
+}
+.f-left{ float: left; }
+.f-right{ float: right }
+.clear{ clear: both; }
+.clearfix{ *zoom: 1;
+  &:after{
+    @include clear();
+  }
+}
+table{ border-collapse: collapse; border-spacing: 0; width: 100%; }
+//input placeholder默认颜色，仅对高版本浏览器
+// WebKit browsers
+::-webkit-input-placeholder{ color: #999; }
+// Mozilla Firefox 4 to 18 */
+:-moz-placeholder{ color: #999; opacity: 1; }
+// Mozilla Firefox 19+
+::-moz-placeholder{ color: #999; opacity: 1; }
+// Internet Explorer 10+
+:-ms-input-placeholder{ color: #999 !important; }
+//去掉ie文本框的叉叉和密码输入框的眼睛图标（兼容模式不管用）
+::-ms-clear, ::-ms-reveal{ display: none; }
+/*表单*/
+.form-group{ position: relative; height: 50px; line-height: 50px; margin-bottom: 20px; clear: both; *zoom: 1;
+  &:after{ @include clear() }
+  .label{ float: left; display: block; width: 110px; text-align: right; margin-right: 5px; z-index: 11; }
+  .input-control{ float: left; background-color: #fff; border: 1px solid #ddd; height: 48px; line-height: 100%; line-height: 48px \9
+  ; padding: 0 10px; width: 350px; overflow: hidden; color: #666; font-size: 16px; font-family: $global-font-family; transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out 0s;
+    //禁止输入类
+    &.disabled{ background: #ddd; }
+    //输入错误添加的样式
+    &.error{ border-color: #ffb500; }
+    //获取焦点
+    &.focus, &:focus{ border-color: #47629d; color: #333; }
+    //输入框输入提示文字颜色
+    .placeholder{ color: #999; font-size: 16px; }
+  }
+  &.auto-height{ height: auto; line-height: normal; }
+  .box{ float: left; position: relative; }
+}
+/*button*/
+.btn{
+  color: #fff; border-radius: 4px; height: 40px; line-height: 40px; font-size: 16px; width: 100px; border: 0; text-align: center; cursor: pointer; font-family: $global-font-family; vertical-align: middle; overflow: hidden; display: inline-block;
+  &:visited{ color: #fff; }
+  &.btn-cancel{ background: #999; /*取消*/
+    &:hover{ background: #999; color: #fff; }
+  }
+}
+.container{ width: 1100px; margin: 0 auto; clear: both; }
