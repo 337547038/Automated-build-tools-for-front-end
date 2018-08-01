@@ -5,10 +5,10 @@
 此次升级移除了用于自动刷新的BrowserSync，添加webpack用于自动刷新。主要是因为BrowserSync自动刷新时很多时候都会比较慢，影响工作效率。
 
 基于版本：
-Node.js 8.9.0
-webpack 3.8.1
-webpack-dev-server 2.9.4
-node-sass 4.6.0
+ - Node.js 10.7.0
+ - webpack-cli@3.1.0
+ - webpack@4.16.3
+ - webpack-dev-server@3.1.5
 
 
 
@@ -16,9 +16,10 @@ node-sass 4.6.0
 
 首先需要安装node.js
 
-1、全局安装webpack及webpack-dev-server，如不需要自动刷新（即运行guilin server命令），这步可以省略。命令：
+1、全局安装webpack、webpack-cli、webpack-dev-server，如不需要自动刷新（即运行guilin server命令），这步可以省略。命令：
    npm install -g webpack
    npm install -g webpack-dev-server
+   npm install -g webpack-cli
 
 2、添加phantomjs为系统变量环境（ 下载地址：http://phantomjs.org/ ）
    下载并解压到任意目录如D:\phantomjs\phantomjs.exe，添加环境变量，我的电脑－>属性－>系统高级设置->环境变量－>系统变量里找到path，追加到后面。如果不需要动态加载模块，这步也可以省略。
@@ -41,16 +42,14 @@ node-sass 4.6.0
      
     Test
        -- build          打包发布后的目录
-       -- node_modules  webpck-dev-server所需的文件，如不需要自动刷新可删除
        --src            发开源文件目录
          --css
-         -- images
+         --images
          --js
          --sass
          --model   存放公共模块，如header.html
-      -- main.js    自动刷新文件，如不需要自动刷新可删除
+         --webpack webpack配置相关文件，如不需要自动刷新可删除
       -- package.json      项目配置信息
-      -- webpack.config.js  webpack配置，如不需要自动刷新可删除
 
   2、guilin build
    简写为guilin b
@@ -135,3 +134,10 @@ node-sass 4.6.0
    1、打包下载360会提示有木马，可能是因为使用了NodeJS的fs文件系统。因为要对文件进行复制粘贴修改等，请放心使用；
 
    2、使用过程有疑问请留言。
+
+## 六、更新日志
+ v0.1.1(2018-8-1)
+
+ - 1.更新webpack版本；
+ - 2.移动根目录下main.js和webpack.config.js文件路径到新文件夹webpack；
+ - 3.添加对webStorm自动保存生成的临时文件___jb_tmp___过滤判断；

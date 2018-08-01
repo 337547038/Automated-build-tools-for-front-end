@@ -21,7 +21,7 @@ module.exports = function (src, dist, type) {
 };
 var copy = function (src, dist, type) {
     // 读取目录中的所有文件
-    if (src.indexOf('src/sass') != -1 || src.indexOf('src/model') != -1) {
+    if (src.indexOf('src/sass') != -1 || src.indexOf('src/model') != -1 || src.indexOf('src/webpack') != -1) {
         //排除两个目录
     } else {
         if (src.indexOf(".html") != -1) {
@@ -119,7 +119,7 @@ var copyFileDirectory = function (src, dst, type) {
                 }
                 // 如果是目录则递归调用自身
                 else if (st.isDirectory()) {
-                    if (_src.indexOf('src/sass') != -1 || _src.indexOf('src/model') != -1) {
+                    if (_src.indexOf('src/sass') != -1 || _src.indexOf('src/model') != -1 || _src.indexOf('src/webpack') != -1) {
                     }
                     else {
                         exists(_src, _dst, copyFileDirectory, type);
