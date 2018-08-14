@@ -39,7 +39,7 @@
 
    1、guilin init
    这条命令会在项目目录在创建基本目录结构：
-     
+
     Test
        -- build          打包发布后的目录
        --src            发开源文件目录
@@ -78,9 +78,7 @@
 - dist：编译生成目录，默认为空即为根目录test，如将文件打包到目录build，dist:”build”
 - port： 启动服务时的端口
 - serverIp： 用于访问的本机ip地址，开启server命令有效，不填写时只能通过 http://localhost 来访问。
-- inputPath：sass入口，默认为index.scss
 - outputStype：sass输出类型,可选nested，expanded，compact，compressed(默认)
-- outputPath：sass输出路径，默认为style.css
 - autoPreFixer：添加css3兼容前缀，默认为true
 - uglifyjs：压缩js，在输入目录生成files.min.js，默认为false
 - mergeJs：合并js,用+号连接，如a.js+b.js
@@ -95,7 +93,7 @@
 ```html
   <div class=header>这是公共头部</div>
 ```
-在src下新建index.html，内容为： 
+在src下新建index.html，内容为：
 ```html
 <body>
       <!-- include href="header.html" -->
@@ -111,9 +109,9 @@
     </body>
 ```
    很多时候header.html也是需要针对不同的页面有一些小改变，例如菜单导航显示当前位置。加载动态时只需要传参数即可，然后在公共模板如header.html里接收参数，并作相关的处理，这里加载模板并解释js需要安装phantomjs。它需要一个url将参数传过去。引入动态模板如
-   
+
     <!-- include href="header.html?a=1" -->
-   
+
    然后在header.html里接收参数a。
    这里有个特殊的地方，因为是url访问，header.html需要一个完整的html页面结构，即包括html,head,body这些标签，否则访问到的有可能是乱码，因此带有参数访问时，只会返回header.html里面id=page”的内容，其它的不会被返回
    ```html
@@ -133,9 +131,18 @@
 
    1、打包下载360会提示有木马，可能是因为使用了NodeJS的fs文件系统。因为要对文件进行复制粘贴修改等，请放心使用；
 
-   2、使用过程有疑问请留言。
+   2、scss引用注意事项，如导入_public.scss和_header.scss；
+   @import "public","header";
+   不能换行和以_开头，也不需要带后缀，多个用豆号隔开
+
+   3、使用过程有疑问请留言。
 
 ## 六、更新日志
+ v0.1.2(2018-8-14)
+
+ - 1.重构sass，添加对输出多个样式优化，对应的输出sass目录下不以_为开头的css文件
+     如./src/sass/index.scss => ./build/css/index.css
+
  v0.1.1(2018-8-1)
 
  - 1.更新webpack版本；

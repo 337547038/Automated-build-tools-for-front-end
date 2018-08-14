@@ -3,13 +3,15 @@ var fs = require("fs");
 var copy = require("./copy");
 var cache = require("./cache");
 var sass = require("./sass");
+var sassInit = require("./sassInit");
+var package0 = fs.readFileSync('./package.json');
+const packageJson = JSON.parse(package0);
+let sassJson = sassInit(true, packageJson, 'watch');//监听前首先编译一次样式，并返回json
 module.exports = function (type) {
   //这里添加个参数，如果是从server过来时，在复制文件时在html页面插入一个js自动刷新脚本
-  var package = fs.readFileSync('./package.json');
-  sass(true, JSON.parse(package), 'watch');//监听前首先编译一次样式
   chokidar.watch('src', {ignored: /(^|[\/\\])\../}).on('all', function (event, path) {
     path = path.replace(/\\/g, '/');//将\换成/
-    var out = './' + JSON.parse(package).dist + "/" + path.substr(4);
+    var out = './' + packageJson.dist + "/" + path.substr(4);
     out = out.replace('//', '/');
     switch (event) {
       case 'addDir':
@@ -31,6 +33,10 @@ module.exports = function (type) {
         if (path.indexOf('.') != -1 && path.indexOf('___jb_tmp___') == -1) {
           copy('./' + path, out, type);
         }
+        //对新增的scss文件
+        if (path.indexOf('.scss') !== -1) {
+          sassJson = sassInit(true, packageJson, 'watch')
+        }
         // console.log('add' + path);
         break;
       case 'change':
@@ -48,7 +54,8 @@ module.exports = function (type) {
             copy('./' + path, out, type);
             createModelCache(event, path);
             if (fileExtension == 'scss') {
-              sass(true, JSON.parse(package), 'watch');
+              createSass(packageJson, path, sassJson)
+              //sass(true, JSON.parse(package), 'watch');
             }
           }
           //监听到文件有变化时每次去修改下main.js，即可达到自动刷新
@@ -81,4 +88,26 @@ var editMainJs = function (path) {
   fs.writeFile("src/webpack/main.js", content, function (err) {
     if (err) throw err;
   });
+};
+/*sass处理*/
+var createSass = function (package, path) {
+//如果是以_开头的，则生成相对应的样式，否则直接生成
+  //let path = './src/sass/index.scss'
+  let index = path.lastIndexOf('/');
+  let name = path.substr(index + 1);
+  if (name.indexOf('_') !== 0) {
+    //不以_开头
+    //map, src, package, type
+    //sass(true, path, package, 'watch');
+    //这里的修改有可能会是添加引入新文件
+    sassJson = sassInit(true, package, 'watch');
+  } else {
+    //读取临时生成的文件，查找到出前文件被哪个文件引用了
+    sassJson.forEach((item) => {
+      name = name.replace('_', '').replace('.scss', '');
+      if (item.include.indexOf(name) !== -1) {
+        sass(true, './src/sass/' + item.file, package, 'watch');
+      }
+    });
+  }
 };

@@ -11,8 +11,6 @@ var Init = function () {
         dist: c.dist,//打包后输出目录，默认为根目录
         port: c.port,
         serverIp:"",//服务器ip，开启服务时可以通过ip地址访问，否则只能使用localhost访问
-        inputPath: c.inputPath,//sass入口路径，默认为./src/sass/index.scss，修改后显示为./src/sass/inputPath
-        outputPath: c.outputPath,//编译后的css路径，默认为./src/css/style.css，若修改,为./src/css/outputPath
         outputStyle: c.outputStyle,//sass输出类型,可选nested，expanded，compact，compressed(默认)
         autoPreFixer: c.autoPreFixer,//自动添加兼容后缀
         uglifyjs:c.uglifyjs,//压缩js
