@@ -17,7 +17,7 @@ module.exports = function () {
     //sass(false, jsonPackage, 'build');//false不生成地图
     copy(src, "./" + jsonPackage.dist, "build");
     mergeJs();
-    sassInit(false, jsonPackage, 'build');
+    sassInit(false, jsonPackage, 'build','');
   });
   cache();
 };

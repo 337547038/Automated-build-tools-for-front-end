@@ -4,10 +4,11 @@ var copy = require("./copy");
 var cache = require("./cache");
 var sass = require("./sass");
 var sassInit = require("./sassInit");
-var package0 = fs.readFileSync('./package.json');
-const packageJson = JSON.parse(package0);
-let sassJson = sassInit(true, packageJson, 'watch');//监听前首先编译一次样式，并返回json
+var sassJson = [];
 module.exports = function (type) {
+  var package0 = fs.readFileSync('./package.json');
+  const packageJson = JSON.parse(package0);
+  sassJson = sassInit(true, packageJson, 'watch', '');//监听前首先编译一次样式，并返回json
   //这里添加个参数，如果是从server过来时，在复制文件时在html页面插入一个js自动刷新脚本
   chokidar.watch('src', {ignored: /(^|[\/\\])\../}).on('all', function (event, path) {
     path = path.replace(/\\/g, '/');//将\换成/
@@ -33,9 +34,9 @@ module.exports = function (type) {
         if (path.indexOf('.') != -1 && path.indexOf('___jb_tmp___') == -1) {
           copy('./' + path, out, type);
         }
-        //对新增的scss文件
-        if (path.indexOf('.scss') !== -1) {
-          sassJson = sassInit(true, packageJson, 'watch')
+        //对新增的scss文件，不以_为开头的
+        if (path.indexOf('.scss') !== -1 && path.indexOf('/_') === -1) {
+          sassJson = sassInit(true, packageJson, 'watch', path)
         }
         // console.log('add' + path);
         break;
@@ -100,10 +101,13 @@ var createSass = function (package, path) {
     //map, src, package, type
     //sass(true, path, package, 'watch');
     //这里的修改有可能会是添加引入新文件
-    sassJson = sassInit(true, package, 'watch');
+    sassJson = sassInit(true, package, 'watch', path);
   } else {
+    console.log('createSass')
+    console.log(sassJson)
     //读取临时生成的文件，查找到出前文件被哪个文件引用了
     sassJson.forEach((item) => {
+      console.log('forEach')
       name = name.replace('_', '').replace('.scss', '');
       if (item.include.indexOf(name) !== -1) {
         sass(true, './src/sass/' + item.file, package, 'watch');
