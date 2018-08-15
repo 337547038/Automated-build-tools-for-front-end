@@ -28,9 +28,12 @@ module.exports = function (map, src, package, type) {
         writeFiles(result.map.toString(), dist + '.map', false);
       }
       if (type === 'build') {
-        //打包时直接生成一份到打包后的目录
-        let out = dist.replace('src', package.dist);
-        autoPreFixer(result.css.toString(), out, type, auto, false, src);
+        // 打包时直接生成一份到打包后的目录
+        // 这里设置延时时间，有可能会存在先生成到打包目录，然后被复制过来的覆盖掉
+        setTimeout(() => {
+          let out = dist.replace('src', package.dist);
+          autoPreFixer(result.css.toString(), out, type, auto, false, src);
+        }, 1000);
       }
     }
   });

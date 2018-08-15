@@ -8,7 +8,7 @@ var sassJson = [];
 module.exports = function (type) {
   var package0 = fs.readFileSync('./package.json');
   const packageJson = JSON.parse(package0);
-  sassJson = sassInit(true, packageJson, 'watch', '');//监听前首先编译一次样式，并返回json
+  //sassJson = sassInit(true, packageJson, 'watch', '');//监听前首先编译一次样式，并返回json
   //这里添加个参数，如果是从server过来时，在复制文件时在html页面插入一个js自动刷新脚本
   chokidar.watch('src', {ignored: /(^|[\/\\])\../}).on('all', function (event, path) {
     path = path.replace(/\\/g, '/');//将\换成/
@@ -36,7 +36,8 @@ module.exports = function (type) {
         }
         //对新增的scss文件，不以_为开头的
         if (path.indexOf('.scss') !== -1 && path.indexOf('/_') === -1) {
-          sassJson = sassInit(true, packageJson, 'watch', path)
+          const sassAdd = sassInit(true, packageJson, 'watch', path);
+          sassJson.push(sassAdd);
         }
         // console.log('add' + path);
         break;
@@ -55,7 +56,7 @@ module.exports = function (type) {
             copy('./' + path, out, type);
             createModelCache(event, path);
             if (fileExtension == 'scss') {
-              createSass(packageJson, path, sassJson)
+              createSass(packageJson, path)
               //sass(true, JSON.parse(package), 'watch');
             }
           }
@@ -92,22 +93,25 @@ var editMainJs = function (path) {
 };
 /*sass处理*/
 var createSass = function (package, path) {
-//如果是以_开头的，则生成相对应的样式，否则直接生成
-  //let path = './src/sass/index.scss'
+// 如果是以_开头的，则生成相对应的样式，否则直接生成
+  // console.log('sassJson')
+  // console.log(sassJson)
   let index = path.lastIndexOf('/');
   let name = path.substr(index + 1);
   if (name.indexOf('_') !== 0) {
-    //不以_开头
-    //map, src, package, type
-    //sass(true, path, package, 'watch');
-    //这里的修改有可能会是添加引入新文件
-    sassJson = sassInit(true, package, 'watch', path);
-  } else {
-    console.log('createSass')
-    console.log(sassJson)
-    //读取临时生成的文件，查找到出前文件被哪个文件引用了
+    // 不以_开头
+    // map, src, package, type
+    // sass(true, path, package, 'watch');
+    // 这里的修改有可能会是添加引入新文件，修改下json里的include即可
+    const newInclude = sassInit(true, package, 'watch', path);
     sassJson.forEach((item) => {
-      console.log('forEach')
+      if (item.file === newInclude.file) {
+        item.include = newInclude.include;
+      }
+    });
+  } else {
+    // 读取临时生成的sassJson，查找到出前文件被哪个文件引用了
+    sassJson.forEach((item) => {
       name = name.replace('_', '').replace('.scss', '');
       if (item.include.indexOf(name) !== -1) {
         sass(true, './src/sass/' + item.file, package, 'watch');
