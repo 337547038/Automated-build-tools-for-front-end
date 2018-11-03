@@ -11,7 +11,7 @@ module.exports = function () {
     var jsonPackage = JSON.parse(package);
     //先清空生成的文件
     deleteAll(jsonPackage.dist, jsonPackage.dist);
-    deleteAll('./src/css/', './src/css/');
+    // deleteAll('./src/css/', './src/css/');
     //创建两个目录，有可能会不存在
     mkdir('./' + jsonPackage.dist);
     mkdir('./' + jsonPackage.dist + '/css');
