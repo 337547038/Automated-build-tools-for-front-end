@@ -58,7 +58,7 @@ function replaceUrl(filename, dist, delImg) {
             if (delImg) {
                 //删除图片
                 for (var i in imgPathArray) {
-                    fs.unlink(imgPathArray[i]);
+                    fs.unlink(imgPathArray[i],function (err) {});
                 }
                 console.log("image " + imgPathArray + " deleted successfully!");
             }
