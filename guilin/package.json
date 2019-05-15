@@ -20,6 +20,8 @@
     "node-sass": "^4.6.0",
     "phantomjs": "^2.1.7",
     "postcss": "^6.0.14",
+    "puppeteer": "^1.16.0",
+    "puppeteer-core": "^1.16.0",
     "uglify-js": "^3.1.8"
   }
 }
