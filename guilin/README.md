@@ -20,10 +20,10 @@
    - npm install -g webpack-dev-server
    - npm install -g webpack-cli
 
-2、将文件夹guilin复制到以下路径C:\Users\当前用户名\AppData\Roaming\npm\node_modules，
-   然后进入C:\Users\当前用户名\AppData\Roaming\npm\node_modules\guilin目录，执行npm install命令安装依懒。
+2、将文件夹`guilin`复制到以下路径`C:\Users\当前用户名\AppData\Roaming\npm\node_modules`，
+   然后进入`C:\Users\当前用户名\AppData\Roaming\npm\node_modules\guilin`目录，执行`npm install`命令安装依懒。
 
-3、最重要的一点：将目录下的guilin.cmd复制到以下目录C:\Users\当前用户名\AppData\Roaming\npm，才能使用下面的所有命令。
+3、最重要的一点：将目录下的`guilin.cmd`复制到以下目录`C:\Users\当前用户名\AppData\Roaming\npm`，才能使用下面的所有命令。
 
    目录下包含了static文件夹，guilin init初始化时会将目录下的文件复制到当前项目目录，因此可以将一些常用的脚本样式图片等放到对应的目录去，初始化时就不用再次复制了。
 
