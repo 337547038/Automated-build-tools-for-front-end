@@ -1,28 +1,17 @@
-var copy = require("./copy");
-//var sass = require("./sass");
-var fs = require("fs");
-var cache = require("./cache");
-var mergeJs = require("./mergeJs");
-var sassInit = require("./sassInit");
-var src = "./src";
+const fs = require('fs');
+const copy = require('./copy');
 module.exports = function () {
-  fs.readFile('./package.json', {encoding: 'utf8'}, function (err, package) {
-    //server(JSON.parse(package).port);
-    var jsonPackage = JSON.parse(package);
-    //先清空生成的文件
-    deleteAll(jsonPackage.dist, jsonPackage.dist);
-    // deleteAll('./src/css/', './src/css/');
-    //创建两个目录，有可能会不存在
-    mkdir('./' + jsonPackage.dist);
-    mkdir('./' + jsonPackage.dist + '/css');
-    //sass(false, jsonPackage, 'build');//false不生成地图
-    copy(src, "./" + jsonPackage.dist, "build");
-    mergeJs();
-    sassInit(false, jsonPackage, 'build','');
-  });
-  cache();
+  const config = JSON.parse(fs.readFileSync('./package.json'));
+  deleteFile(config.dist, config.dist); // 清出输入目录及所有文件
+  deleteFile('src/css', 'src/css', 'map'); // 删除src目录css地图文件
+  deleteFile('src/model/cache', 'src/model/cache'); // 清除所有缓存临时文件
+  // 创建两个文件夹
+  mkdir('./' + config.dist);
+  mkdir('./' + config.dist + '/css');
+  copy('./src', "./" + config.dist, "build")
 };
 
+/* 创建目录 */
 function mkdir(dst) {
   fs.exists(dst, function (exists) {
     // 已存在
@@ -30,25 +19,33 @@ function mkdir(dst) {
     }
     // 不存在
     else {
-      fs.mkdirSync(dst);
+      fs.mkdirSync(dst)
     }
-  });
+  })
 }
 
-function deleteAll(path, root) {
-  var files = [];
+/* 清出输入目录及所有文件 */
+function deleteFile(path, root, type) {
+  let files = [];
   if (fs.existsSync(path)) {
     files = fs.readdirSync(path);
     files.forEach(function (file, index) {
-      var curPath = path + "/" + file;
+      const curPath = path + "/" + file;
       if (fs.statSync(curPath).isDirectory()) { // recurse
-        deleteAll(curPath, root);
+        deleteFile(curPath, root)
       } else { // delete file
-        fs.unlinkSync(curPath);
+        if (type === 'map') {
+          // 只删除.map文件
+          if (curPath.indexOf('.css.map') !== -1) {
+            fs.unlinkSync(curPath)
+          }
+        } else {
+          fs.unlinkSync(curPath)
+        }
       }
     });
-    if (path != root) {//要目录文件夹不删除
-      fs.rmdirSync(path);
+    if (path !== root) {//要目录文件夹不删除
+      fs.rmdirSync(path)
     }
   }
 }

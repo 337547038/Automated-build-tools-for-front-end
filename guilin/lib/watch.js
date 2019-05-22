@@ -1,121 +1,70 @@
-﻿var chokidar = require('chokidar');
-var fs = require("fs");
-var copy = require("./copy");
-var cache = require("./cache");
-var sass = require("./sass");
-var sassInit = require("./sassInit");
-var sassJson = [];
+const chokidar = require('chokidar');
+const fs = require("fs");
+const copy = require("./copy");
+const sass = require("./sass");
+/* 监听文件，server命令也是引用watch，type作为参数用于区别
+* type:server 表示来源是server，其它时候为空
+* */
 module.exports = function (type) {
-  var package0 = fs.readFileSync('./package.json');
-  const packageJson = JSON.parse(package0);
-  //sassJson = sassInit(true, packageJson, 'watch', '');//监听前首先编译一次样式，并返回json
+  if (!type) {
+    type = 'watch'
+  }
+  const config = JSON.parse(fs.readFileSync('./package.json'));
   //这里添加个参数，如果是从server过来时，在复制文件时在html页面插入一个js自动刷新脚本
   chokidar.watch('src', {ignored: /(^|[\/\\])\../}).on('all', function (event, path) {
-    path = path.replace(/\\/g, '/');//将\换成/
-    var out = './' + packageJson.dist + "/" + path.substr(4);
-    out = out.replace('//', '/');
+    // path带有src/开头
+    path = path.replace(/\\/g, '/');// 将\换成/
+    const dist = './' + config.dist + "/" + path.substr(4);
+    const src = './' + path;
     switch (event) {
       case 'addDir':
-        //这里只创建目录即可，除开特殊的sass,model,webpack
-        if (path.indexOf('src/sass') != -1 || path.indexOf('src/model') != -1 || path.indexOf('src/webpack') != -1) {
+        // 这里只创建目录即可，除开特殊的sass,model,webpack
+        if (path.indexOf('src/sass') !== -1 || path.indexOf('src/model') !== -1 || path.indexOf('src/webpack') !== -1) {
         } else {
-          fs.exists("./" + out, function (exists) {
+          fs.exists("./" + dist, function (exists) {
             if (exists) {
-              //存在
+              // 存在
             } else {
-              fs.mkdirSync("./" + out);
+              fs.mkdirSync("./" + dist)
             }
-          });
+          })
         }
         break;
       case 'add':
-        //过滤掉有些编辑器产生这样那样的临时文件，如ps保存图片时没后缀的文件
-        //webStorm自动保存时的___jb_tmp___
-        if (path.indexOf('.') != -1 && path.indexOf('___jb_tmp___') == -1) {
-          copy('./' + path, out, type);
+        // 过滤掉有些编辑器产生这样那样的临时文件，如ps保存图片时没后缀的文件
+        // webStorm自动保存时的___jb_tmp___
+        if (path.indexOf('.') !== -1 && path.indexOf('___jb_tmp___') === -1) {
+          copy(src, dist, type)
         }
-        //对新增的scss文件，不以_为开头的
-        if (path.indexOf('.scss') !== -1 && path.indexOf('/_') === -1) {
-          const sassAdd = sassInit(true, packageJson, 'watch', path);
-          sassJson.push(sassAdd);
-        }
-        // console.log('add' + path);
         break;
       case 'change':
-        //仅对指定的文件进行操作，即监听文件的类型
-        var suffix = ['html', 'css', 'js', 'jpg', 'png', 'gif', 'scss'];
-        var fileExtension = path.substr(path.lastIndexOf('.') + 1);
-        if (suffix.indexOf(fileExtension) != -1 && path.indexOf('src/webpack') == -1) {
-          //很多时候修改图片后复制过去后变成0字节的图片，这里设置延时
-          if (fileExtension == "jpg" || fileExtension == "gif" || fileExtension == "png") {
+        // 仅对指定的文件进行操作，即监听文件的类型
+        const suffix = ['html', 'css', 'js', 'jpg', 'png', 'gif', 'scss'];
+        const fileExtension = path.substr(path.lastIndexOf('.') + 1);
+        if (suffix.indexOf(fileExtension) !== -1 && path.indexOf('src/webpack') === -1) {
+          // 很多时候修改图片后复制过去后变成0字节的图片，这里设置延时
+          if (fileExtension === "jpg" || fileExtension === "gif" || fileExtension === "png") {
             setTimeout(function () {
-              copy('./' + path, out, type);
+              copy(src, dist, type)
             }, 1000);
-            //console.log('settimeout');
+          } else if (fileExtension === 'scss' && path.lastIndexOf('/_') !== -1) {
+            // 这里特殊处理下，以_开头的scss文件
+            sass('directory')
           } else {
-            copy('./' + path, out, type);
-            createModelCache(event, path);
-            if (fileExtension == 'scss') {
-              createSass(packageJson, path)
-              //sass(true, JSON.parse(package), 'watch');
-            }
+            copy(src, dist, type, event)
           }
-          //监听到文件有变化时每次去修改下main.js，即可达到自动刷新
-          editMainJs(path);
+          // 监听到文件有变化时每次去修改下main.js，即可达到自动刷新
+          const content = `var a='${path} + ${new Date().toLocaleTimeString()}'`;
+          fs.writeFile("src/webpack/main.js", content, function (err) {
+            if (err) throw err
+          })
         }
-        //console.log('change' + path);
         break;
       case 'unlink':
-        //这里是删除文件，修改时有些编译器会先删除再新增。。
-        //fs.unlink(out);
-        //console.log('unlink');
-        break;
+        // 这里是删除文件，修改时有些编译器会先删除再新增。。所以这里暂不作处理
+        // fs.unlink(out);
+        // console.log('unlink');
+        break
     }
-  });
-  cache();
-};
-/*创建模板缓存*/
-var createModelCache = function (event, path) {
-  //仅在修改时,修改model下的模块时
-  if (event == 'change' && path.indexOf('src/model/') != -1) {
-    //要排除cache目录的，生成时也会触发change
-    if (path.indexOf('src/model/cache/') == -1) {
-      cache(path.replace('src/model/'));
-    }
-  }
-};
-var editMainJs = function (path) {
-  //随便写点适合js格式的内容进去
-  var content = "var a='" + path + " " + new Date().toLocaleTimeString() + "'";
-  fs.writeFile("src/webpack/main.js", content, function (err) {
-    if (err) throw err;
-  });
-};
-/*sass处理*/
-var createSass = function (package, path) {
-// 如果是以_开头的，则生成相对应的样式，否则直接生成
-  // console.log('sassJson')
-  // console.log(sassJson)
-  let index = path.lastIndexOf('/');
-  let name = path.substr(index + 1);
-  if (name.indexOf('_') !== 0) {
-    // 不以_开头
-    // map, src, package, type
-    // sass(true, path, package, 'watch');
-    // 这里的修改有可能会是添加引入新文件，修改下json里的include即可
-    const newInclude = sassInit(true, package, 'watch', path);
-    sassJson.forEach((item) => {
-      if (item.file === newInclude.file) {
-        item.include = newInclude.include;
-      }
-    });
-  } else {
-    // 读取临时生成的sassJson，查找到出前文件被哪个文件引用了
-    sassJson.forEach((item) => {
-      name = name.replace('_', '').replace('.scss', '');
-      if (item.include.indexOf(name) !== -1) {
-        sass(true, './src/sass/' + item.file, package, 'watch');
-      }
-    });
-  }
+  })
 };

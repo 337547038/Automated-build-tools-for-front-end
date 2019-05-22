@@ -1,29 +1,34 @@
-var phantom = require("./phantom");
-var fs = require("fs");
-/*有路径参数时，查找当前路径的重新生成，否则生成全部*/
-module.exports = function (filesName) {
-    var path = './src/model/cache/cache.txt';
-    fs.exists(path, function (exists) {
-        if (exists) {
-            fs.readFile(path, {encoding: 'utf8'}, function (err, data) {
-                if (err) {
-                    throw err;
-                }
-                if (data != '') {
-                    var cache = data.split('\n');
-                    for (var i = 0; i < cache.length; i++) {
-                        if (cache[i] != '') {
-                            if (filesName) {
-                                if (cache[i].indexOf(filesName) != -1) {
-                                    phantom(cache[i])
-                                } 
-                            } else {
-                                phantom(cache[i])
-                            }
-                        }
-                    }
-                }
-            })
+/**
+ * Created by 337547038
+ */
+const fs = require("fs");
+const puppeteer = require("./puppeteer");
+/* 创建模板缓存 在修改了model目录下的文件时*/
+module.exports = function (src, type) {
+  const copy = require('./copy');
+  // 这里要排除cache目录的下文件
+  if (src.indexOf('src/model/cache/') === -1) {
+    // console.log(src);
+    // 根据已生成的model/cache/cache.json生成对的缓存文件入所有引用的html文件
+    const cachePath = './src/model/cache/cache.json';
+    if (!fs.existsSync(cachePath)) {
+      return // 不存在直接返回
+    }
+    const fileName = src.replace('./src/model/', '');
+    const cache = JSON.parse(fs.readFileSync(cachePath));
+    if (cache.length > 0) {
+      let hasPath = []; // 已生成列表
+      cache.forEach(item => {
+        if (item.include.indexOf(fileName) !== -1) {
+          // 减少重复生成缓存次数，同参数文件被多个页面引用时
+          if (hasPath.indexOf(item.include) === -1) {
+            hasPath.push(item.include);
+            puppeteer(item.include, copy.bind(this, item.src, item.dist, type))
+          } else {
+            copy(item.src, item.dist, type)
+          }
         }
-    });
+      })
+    }
+  }
 };

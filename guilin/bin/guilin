@@ -1,57 +1,39 @@
 #!/usr/bin/env node
-var init = require('../lib/init.js');
-var build = require('../lib/build.js');
-var watch = require('../lib/watch.js');
-var server = require('../lib/server.js');
-var mergeJs = require('../lib/mergeJs.js');
-var imgToBase64 = require('../lib/imgToBase64.js');
-var program = require('commander');
+const init = require('../lib/init.js');
+const build = require('../lib/build.js');
+const watch = require('../lib/watch.js');
+const server = require('../lib/server.js');
+const program = require('commander');
 program
-  .command('init')
-  .alias('i')
-  .description('')
-  .action(function (name) {
-    init();
-    //process.exit(0);
-  });
+.command('init')
+.alias('i')
+.description('')
+.action(function (name) {
+  init();
+  //process.exit(0);
+});
 program
-   .command('build')
-   .alias('b')
-   .description('')
-   .action(function () {
-      build();
-      //process.exit(0);
-    });
+.command('build')
+.alias('b')
+.description('')
+.action(function () {
+  build();
+  //process.exit(0);
+});
 program
-   .command('server')
-   .alias('s')
-   .description('')
-   .action(function () {
-      server();
-     // process.exit(0);
-    });
+.command('server')
+.alias('s')
+.description('')
+.action(function () {
+  server();
+  // process.exit(0);
+});
 program
-    .command('watch')
-    .alias('w')
-    .description('')
-    .action(function () {
-      watch();
-      //process.exit(0);
-    });
-program
-    .command('merge')
-    .alias('m')
-    .description('')
-    .action(function () {
-      mergeJs();
-      //process.exit(0);
-    });
-program
-    .command('imgToBase64')
-    .alias('t')
-    .description('')
-    .action(function () {
-          imgToBase64();
-          //process.exit(0);
-        });
+.command('watch')
+.alias('w')
+.description('')
+.action(function () {
+  watch();
+  //process.exit(0);
+});
 program.parse(process.argv);

@@ -1,61 +1,113 @@
-﻿var fs = require("fs");
-var sass = require('node-sass');
-var autoprefixer = require('autoprefixer');
-var postcss = require('postcss');
+/**
+ * Created by 337547038.
+ */
+const fs = require("fs");
+const sass = require('node-sass');
+const autoprefixer = require('autoprefixer');
+const postcss = require('postcss');
+/* 编辑css
+ * path:单个文件路径时，编译当前。path=directory目录时，编译当前路径下所有不以_开头的 */
+module.exports = function (path, type) {
+  const config = JSON.parse(fs.readFileSync('./package.json'));
+  if (path === 'directory') {
+    // 目录时，侧编译sass目录下所有不以_开头的scss，仅处理一级目录
+    fs.readdir('src/sass/', function (err, paths) {
+      if (err) {
+        throw err
+      }
+      paths.forEach(function (src) {
+        if (src.indexOf('_') !== 0) {
+          // 不是以_开头
+          const dist = 'src/css/' + src.replace('.scss', '.css');
+          // sassRender(outputStyle, dist, map, auto, type, 'src/sass/' + src)
+          sassRender(config, dist, type, 'src/sass/' + src)
+        }
+      })
+    })
+  } else {
+    const dist = path.replace('/sass/', '/css/').replace('.scss', '.css');
+    sassRender(config, dist, type, path)
+  }
+};
 
-//map true时生成sourceMap，src sass路径,type build不输出信息
-module.exports = function (map, src, package, type) {
-  /*var src = './src/sass/index.scss';
-  var dist = './src/css/index.css';*/
-  // 输出路径为./src/css/同输入文件名.css
-  var outputStyle = package.outputStyle || 'compressed';
-  var dist = src.replace('/sass/', '/css/').replace('.scss', '.css');
-  var auto = package.autoPreFixer;
-  //sassNode(src, outputStyle, dist, map, auto);
+function sassRender(config, dist, type, path) {
+  const outputStyle = config.outputStyle || 'compressed';
+  // const auto = config.autoPreFixer;
+  const map = type === 'watch'; // 监听时生成地图
+  // const imgToBase64 = config.imgToBase64;
   sass.render({
-    file: src,
+    file: path,
     outputStyle: outputStyle,//Type: String Default: nested Values: nested, expanded, compact, compressed
-    outFile: dist,//生成map所需的选项，并不会生成文件
+    outFile: dist,// 生成map所需的选项，并不会生成文件
     sourceMap: map
   }, function (err, result) {
     if (err) {
       console.log('error ' + err.line + ":" + err.column);
-      console.log(err.message);
+      console.log(err.message)
     } else {
-      //css内容,输出路经,是否输出log,是否添加前缀,类型,是否生成地图
-      autoPreFixer(result.css.toString(), dist, type, auto, map, src);
+      //css内容，输出路径，类型，兼容前缀，地图，源文件路径
+      autoPreFixer(result.css.toString(), dist, type, config, map, path);
       if (map) {
-        writeFiles(result.map.toString(), dist + '.map', false);
-      }
-      if (type === 'build') {
-        // 打包时直接生成一份到打包后的目录
-        // 这里设置延时时间，有可能会存在先生成到打包目录，然后被复制过来的覆盖掉
-        setTimeout(() => {
-          let out = dist.replace('src', package.dist);
-          autoPreFixer(result.css.toString(), out, type, auto, false, src);
-        }, 1000);
+        writeFiles(result.map.toString(), dist + '.map', false)
       }
     }
-  });
-};
+  })
+}
 
-function autoPreFixer(css, outPath, type, auto, map, inputPath) {
-  let log = type == 'build' ? false : true;
-  if (auto) {
+/* 添加前缀 */
+function autoPreFixer(css, outPath, type, config, map, inputPath) {
+  let log = type === 'watch';
+  if (config.autoPreFixer) {
     //编译后再将样式添加兼容前缀时会去掉map信息，watch时追加回去。（暂没找到配置办法）
-    var sourceMap = '';
-    if (type == 'watch' && map) {
-      sourceMap = '/*# sourceMappingURL=' + outPath.replace('./src/css/', '') + '.map */';
+    let sourceMap = '';
+    if (type === 'watch' && map) {
+      sourceMap = '\r\r/*# sourceMappingURL=' + outPath.replace('./src/css/', '') + '.map */'
     }
     postcss([autoprefixer])
     .process(css, {from: inputPath, to: outPath})
     .then(result => {
-      writeFiles(result.css + sourceMap, outPath, log);
-      //fs.writeFile('dest/app.css', result.css);
-      //if ( result.map ) fs.writeFile('dest/app.css.map', result.map);
-    });
+      // writeFiles(result.css + sourceMap, outPath, log)
+      imgToBase64(result.css + sourceMap, outPath, log, config)
+    })
   } else {
-    writeFiles(css, outPath, log)
+    // writeFiles(css, outPath, log)
+    imgToBase64(css, outPath, log, config)
+  }
+}
+
+/* 图片转base64 */
+function imgToBase64(content, dist, log, config) {
+  if (config.imgToBase64) {
+    const dataReplace = content.replace(/url\((.+?)\)/gi, function (matchs, m1) {
+      // 检查图片存在
+      // 有些背景加了双引号的，这里去掉
+      m1 = m1.replace(/"/g, "");
+      let imgPath = "./src/" + m1;// 转换图片路径
+      imgPath = imgPath.replace("../", "").replace(/\/\//g, "/");
+      if (fs.existsSync(imgPath)) {
+        const bData = fs.readFileSync(imgPath);
+        if (bData.length / 1024 < config.imgLimit) {//小于imgLimit K
+          const suffix = m1.substr(m1.length - 3, m1.length); // 取最后三位
+          // 从生成路径中删除当前图片
+          let delPath = './' + config.dist + '/' + m1;
+          delPath = delPath.replace("../", "").replace(/\/\//g, "/");
+          // 可能会出现图片还没复制过来
+          setTimeout(() => {
+            fs.unlink(delPath, function (err) {
+              console.log(`error:${delPath}`)
+            })
+          }, 1000);
+          return `url(data:image/${suffix};base64,${bData.toString('base64')})`
+        } else {
+          return `url(${m1})`
+        }
+      } else {
+        return `url(${m1})`
+      }
+    });
+    writeFiles(dataReplace, dist, log)
+  } else {
+    writeFiles(content, dist, log)
   }
 }
 
@@ -64,10 +116,10 @@ function writeFiles(content, filename, log) {
     encoding: 'utf8'
   }, function (err) {
     if (err) {
-      throw err;
+      throw err
     }
     if (log) {
-      console.log(filename + " " + new Date().toLocaleTimeString());
+      console.log(filename + " " + new Date().toLocaleTimeString())
     }
-  });
+  })
 }

@@ -1,1 +1,43 @@
-this is header
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Title</title>
+</head>
+<body>
+<!--借助vue.js或jquery输出不同的公共部分-->
+<div id="page">
+  <div class="header">
+    <ul>
+      <li :class="{active:active==='0'}"><a href="javascript:;">首页</a></li>
+      <li :class="{active:active==='1'}"><a href="javascript:;">关于我们</a></li>
+    </ul>
+  </div>
+</div>
+<script src="vue.min.js"></script>
+<script type="text/javascript">
+  new Vue({
+    el: "#page",
+    data: {
+      active: ''
+    },
+    created: function () {
+      // 接收参数
+      this.active = this.getQueryString('active');
+    },
+    methods: {
+      getQueryString(name) {
+        const reg = new RegExp("(^|&)" + name + "=([^&]*)(&|)", "i");
+        const r = window.location.search.substr(1).match(reg);
+        if (r != null) {
+          return r[2];
+        }
+        else {
+          return "";
+        }
+      }
+    }
+  })
+</script>
+</body>
+</html>

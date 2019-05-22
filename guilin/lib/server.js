@@ -1,42 +1,39 @@
-﻿var fs = require("fs");
-var exec = require('child_process').exec;
-var watch = require('./watch');
-var net = require('net');
+const fs = require("fs");
+const exec = require('child_process').exec;
+const net = require('net');
+const watch = require('./watch');
 module.exports = function () {
-  var package = JSON.parse(fs.readFileSync('./package.json'));
-  var build = "";
-  if (package.dist !== "") {
-    build = '--content-base ' + package.dist + '/';
+  const config = JSON.parse(fs.readFileSync('./package.json'));
+  let build = "";
+  if (config.dist !== "") {
+    build = '--content-base ' + config.dist + '/'
   }
 
-  var serverIp = "";
-  if (package.serverIp !== "") {
-    serverIp = ' --host ' + package.serverIp;
+  let serverIp = "";
+  if (config.serverIp !== "") {
+    serverIp = ' --host ' + config.serverIp
   }
-  var url = 'http://localhost:';
   let portUrl = 'localhost';
-  if (package.serverIp !== "") {
-    url = 'http://' + package.serverIp + ':';
-    portUrl = package.serverIp
+  if (config.serverIp !== "") {
+    portUrl = config.serverIp
   }
-  const port = portIsOccupied(parseInt(package.port), portUrl, function (port) {
-
+  const port = portIsOccupied(parseInt(config.port), portUrl, function (port) {
     //var option = 'webpack-dev-server --progress --colors --hot --inline ' + build + serverIp + ' --port ' + package.port + ' ';
-    var option = 'webpack-dev-server ' + build + serverIp + ' --port ' + port + ' --mode development --config src/webpack/webpack.config.js';
+    const option = 'webpack-dev-server ' + build + serverIp + ' --port ' + port + ' --mode development --config src/webpack/webpack.config.js';
     exec(option, function (err, stdout, stderr) {
       if (err) {
         console.error(`exec error: ${err}`);
-        return;
+        return
       }
-      //console.log(`stdout: ${stdout}`);
+      console.log(`stdout: ${stdout}`)
     });
-    console.log('server running at ' + url + port + '/');
-    setTimeout(function () {
-      exec('start ' + url + port + '/');//打开浏览器窗口，设置延时打开窗口，很多时候服务还没启动，窗口就打开了，显示出错
-    }, 3000);
     watch('server');
-
-  });
+    const url = `http://${portUrl}:${port}/`;
+    console.log('server running at ' + url);
+    setTimeout(function () {
+      exec('start ' + url)// 打开浏览器窗口，设置延时打开窗口，很多时候服务还没启动，窗口就打开了，显示出错
+    }, 3000)
+  })
 };
 
 // 检测端口有没在使用
@@ -54,6 +51,6 @@ function portIsOccupied(port, url, callback) {
       portIsOccupied(port + 1, url, callback); // 不可用时加1
       console.log(`this port ${port} is occupied.try another.`)
     }
-  });
+  })
   // return port
 }
