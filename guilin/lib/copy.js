@@ -80,16 +80,16 @@ function copyHtml(src, dist, type, event) {
       // m1就是匹配的路径地址了
       // 如果地址包含有参数，首先读取缓存文件，没有时则先生成缓存文件再重新生成当前文件
       let htmlPath = m1;
+      if (includeHas.indexOf(m1 + src) === -1) {
+        includeHas.push(m1 + src);
+        includeHtml.push({
+          include: m1,
+          src: src,
+          dist: dist
+        });
+        writeFileArry(includeHtml);
+      }
       if (m1.indexOf('?') !== -1) {
-        if (includeHas.indexOf(m1 + src) === -1) {
-          includeHas.push(m1 + src);
-          includeHtml.push({
-            include: m1,
-            src: src,
-            dist: dist
-          });
-          writeFileArry(includeHtml);
-        }
         m1 = "cache/" + encodeURIComponent(m1)
       }
       // 如果m1文件不存在时，则返回空

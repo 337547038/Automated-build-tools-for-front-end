@@ -23,7 +23,13 @@ module.exports = function (src, type) {
           // 减少重复生成缓存次数，同参数文件被多个页面引用时
           if (hasPath.indexOf(item.include) === -1) {
             hasPath.push(item.include);
-            puppeteer(item.include, copy.bind(this, item.src, item.dist, type))
+            if (item.include.indexOf('?') !== -1) {
+              // 包含有参数的，先生成
+              puppeteer(item.include, copy.bind(this, item.src, item.dist, type))
+            } else {
+              // 没参数的，直接生成当前文件
+              copy(item.src, item.dist, type)
+            }
           } else {
             copy(item.src, item.dist, type)
           }
