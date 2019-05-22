@@ -1,6 +1,6 @@
 const fs = require("fs");
 const config = require("../package.json");
-const copy = require('../lib/copy');
+const copy = require('./copy');
 module.exports = function () {
   const data = {
     name: config.name,

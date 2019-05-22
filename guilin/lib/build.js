@@ -13,7 +13,7 @@ module.exports = function () {
 
 /* 创建目录 */
 function mkdir(dst) {
-  fs.exists(dst, function (exists) {
+  fs.existsSync(dst, function (exists) {
     // 已存在
     if (exists) {
     }
