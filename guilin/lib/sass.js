@@ -33,12 +33,17 @@ module.exports = function (path, type) {
 function sassRender(config, dist, type, path) {
   const outputStyle = config.outputStyle || 'compressed';
   // const auto = config.autoPreFixer;
-  const map = type === 'watch'; // 监听时生成地图
+  let map = false; // 监听时生成地图
+  if (type === 'watch' || type === 'server') {
+    map = true
+  }
   // const imgToBase64 = config.imgToBase64;
   sass.render({
     file: path,
     outputStyle: outputStyle,//Type: String Default: nested Values: nested, expanded, compact, compressed
     outFile: dist,// 生成map所需的选项，并不会生成文件
+    // sourceComments: true,
+    //sourceMapContents: true,
     sourceMap: map
   }, function (err, result) {
     if (err) {
@@ -60,8 +65,8 @@ function autoPreFixer(css, outPath, type, config, map, inputPath) {
   if (config.autoPreFixer) {
     //编译后再将样式添加兼容前缀时会去掉map信息，watch时追加回去。（暂没找到配置办法）
     let sourceMap = '';
-    if (type === 'watch' && map) {
-      sourceMap = '\r\r/*# sourceMappingURL=' + outPath.replace('./src/css/', '') + '.map */'
+    if (map) {
+      sourceMap = `\r\r/*# sourceMappingURL=${outPath.replace('./src/css/', '')}.map */`
     }
     postcss([autoprefixer])
     .process(css, {from: inputPath, to: outPath})

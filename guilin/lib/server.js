@@ -17,9 +17,9 @@ module.exports = function () {
   if (config.serverIp !== "") {
     portUrl = config.serverIp
   }
+  watch('server');
   const port = portIsOccupied(parseInt(config.port), portUrl, function (port) {
-    //var option = 'webpack-dev-server --progress --colors --hot --inline ' + build + serverIp + ' --port ' + package.port + ' ';
-    const option = 'webpack-dev-server ' + build + serverIp + ' --port ' + port + ' --mode development --config src/webpack/webpack.config.js';
+    const option = `webpack-dev-server ${build} ${serverIp} --port ${port} --mode development --config src/webpack/webpack.config.js`;
     exec(option, function (err, stdout, stderr) {
       if (err) {
         console.error(`exec error: ${err}`);
@@ -27,10 +27,9 @@ module.exports = function () {
       }
       console.log(`stdout: ${stdout}`)
     });
-    watch('server');
     const url = `http://${portUrl}:${port}/`;
-    console.log('server running at ' + url);
     setTimeout(function () {
+      console.log('\x1B[32m%s\x1B[39m', 'server running at ' + url);
       exec('start ' + url)// 打开浏览器窗口，设置延时打开窗口，很多时候服务还没启动，窗口就打开了，显示出错
     }, 3000)
   })
