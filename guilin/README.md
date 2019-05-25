@@ -65,7 +65,7 @@
 - 一般情况无需配置，用默认的即可。
 - dist:'build' 编译生成目录，默认为空即为根目录test，如将文件打包到目录build，dist:”build”
 - port:'8090' 启动服务时的端口
-- serverIp: 用于访问的本机ip地址，开启server命令有效，不填写时只能通过 http://localhost 来访问。
+- serverIp: 用于访问的本机ip地址，开启server命令有效，不填写时只能通过 http://localhost 来访问。可为true(自动获取ip地址)或指定ip地址
 - outputStype:'compressed' sass输出类型,可选nested，expanded，compact，compressed(默认)
 - autoPreFixer:true 添加css3兼容前缀，默认为true
 - uglifyjs:false 压缩js，在输入目录生成files.min.js，默认为false
