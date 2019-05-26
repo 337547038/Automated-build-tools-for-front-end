@@ -61,7 +61,6 @@ function sassRender(config, dist, type, path) {
 
 /* 添加前缀 */
 function autoPreFixer(css, outPath, type, config, map, inputPath) {
-  let log = type === 'watch';
   if (config.autoPreFixer) {
     //编译后再将样式添加兼容前缀时会去掉map信息，watch时追加回去。（暂没找到配置办法）
     let sourceMap = '';
@@ -69,19 +68,21 @@ function autoPreFixer(css, outPath, type, config, map, inputPath) {
       sourceMap = `\r\r/*# sourceMappingURL=${outPath.replace('./src/css/', '')}.map */`
     }
     postcss([autoprefixer])
-    .process(css, {from: inputPath, to: outPath})
-    .then(result => {
-      // writeFiles(result.css + sourceMap, outPath, log)
-      imgToBase64(result.css + sourceMap, outPath, log, config)
-    })
+      .process(css, {from: inputPath, to: outPath})
+      .then(result => {
+        // writeFiles(result.css + sourceMap, outPath, log)
+        imgToBase64(result.css + sourceMap, outPath, type, config)
+      })
   } else {
     // writeFiles(css, outPath, log)
-    imgToBase64(css, outPath, log, config)
+    imgToBase64(css, outPath, type, config, type)
   }
 }
 
 /* 图片转base64 */
-function imgToBase64(content, dist, log, config) {
+function imgToBase64(content, dist, type, config) {
+  let log = type === 'watch';
+  const outPath = dist.replace('src/css', `${config.dist}/css`);
   if (config.imgToBase64) {
     const dataReplace = content.replace(/url\((.+?)\)/gi, function (matchs, m1) {
       // 检查图片存在
@@ -99,7 +100,9 @@ function imgToBase64(content, dist, log, config) {
           // 可能会出现图片还没复制过来
           setTimeout(() => {
             fs.unlink(delPath, function (err) {
-              console.log(`error:${delPath}`)
+              if (err) {
+                console.log(`Image deletion failed:${delPath}`)
+              }
             })
           }, 1000);
           return `url(data:image/${suffix};base64,${bData.toString('base64')})`
@@ -110,9 +113,17 @@ function imgToBase64(content, dist, log, config) {
         return `url(${m1})`
       }
     });
-    writeFiles(dataReplace, dist, log)
+    writeFiles(dataReplace, dist, log);
+    if (type === 'build') {
+      // 生成后复制一份到输出目录
+      fs.createReadStream(dist).pipe(fs.createWriteStream(outPath))
+    }
   } else {
-    writeFiles(content, dist, log)
+    writeFiles(content, dist, log);
+    if (type === 'build') {
+      // 生成后复制一份到输出目录
+      fs.createReadStream(dist).pipe(fs.createWriteStream(outPath))
+    }
   }
 }
 
