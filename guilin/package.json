@@ -4,6 +4,7 @@
   "description": "",
   "dependencies": {
     "autoprefixer": "^9.5.1",
+    "canvas": "^2.5.0",
     "chokidar": "^3.0.0",
     "commander": "^2.20.0",
     "node-sass": "^4.12.0",
