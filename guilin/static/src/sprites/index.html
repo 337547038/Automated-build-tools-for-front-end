@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>css sprites</title>
+  <style>
+    body, div, ul, li, pre{margin: 0;padding: 0}
+    body{padding: 0 20px}
+    ul, li{font-style: normal}
+    h1{text-align: center;}
+    pre{padding: 5px 10px;display: inline-block;background: #ddd;color: red;font-size: 18px;}
+    .demo li{display: flex;align-items: center;border-bottom: 1px solid #ddd;padding-bottom: 15px;margin-bottom: 15px;color: #999;}
+    .demo i{display: inline-block;background-image: url(../images/sprites.png);margin-right: 20px;}
+    .demo span{margin-left: 20px;color: #333;}
+    .total{color: red}
+  </style>
+</head>
+<body>
+<h1>Css Sprites</h1>
+<pre>background-images:url(../images/sprites.png)</pre>
+<div>
+  <h3>共 <span class="total">0</span> 个图片</h3>
+  <ul class="demo">
+  </ul>
+</div>
+<div class="intro">
+  <p>1、将所有需要合并的图片放在目录./src/sprites/icons下；</p>
+  <p>2、运行命令guilin sprites即可将所有指定的图片合并为sprites.png；新增图片时执行命令即可；</p>
+  <p>3、仅支持jpg和png两种格式，并且不支持中文命名；</p>
+  <p>4、如需重新生成，请手动删除文件./src/sprites/icons.json后重执行合并命令，重新生成后图片位置会发生变化，请慎重</p>
+</div>
+</body>
+</html>

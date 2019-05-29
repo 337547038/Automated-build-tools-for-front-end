@@ -15,17 +15,24 @@ module.exports = function () {
     // mergaJsName: "", // 合并后的js输出文件名
     imgToBase64: false,// 将样式中的背景图片转为base64
     imgLimit: 10, // 图片转换base64最大值，大于此值不转换，单位k
-    //imgToBaseDel: false,// 转换后删除图片，如果多个样式引用同一个图片，删除图片会出错，此时建议设为false
+    spritesWidth: 500, // css sprites图片的宽
     scripts: {
       "build": "guilin build",
       "watch": "guilin watch",
-      "server": "guilin server"
+      "server": "guilin server",
+      "sprites": "guilin sprites"
     }
   };
   fs.writeFile("package.json", JSON.stringify(data, null, 2), function (err) {
     if (err) throw err
   });
-  //将一些静态资源复制到项目目录
-  copy(__dirname.replace("lib", "static"), './', 'init');
-  console.log('successful init')
+  fs.access('./src', function (err) {
+    if (err) {
+      // 不存在目录时，将一些静态资源复制到项目目录
+      copy(__dirname.replace("lib", "static"), './', 'init');
+      console.log('successful init')
+    } else {
+      console.log('\x1B[33m%s\x1B[39m', 'The project already exists and the package.json was successfully updated.')
+    }
+  })
 };

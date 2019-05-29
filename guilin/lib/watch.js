@@ -19,12 +19,11 @@ module.exports = function (type) {
     switch (event) {
       case 'addDir':
         // 这里只创建目录即可，除开特殊的sass,model,webpack
-        if (path.indexOf('src/sass') !== -1 || path.indexOf('src/model') !== -1 || path.indexOf('src/webpack') !== -1) {
+        if (path.indexOf('src/sass') !== -1 || path.indexOf('src/model') !== -1 || path.indexOf('src/webpack') !== -1 || path.indexOf('src/sprites') !== -1) {
         } else {
-          fs.exists("./" + dist, function (exists) {
+          fs.access("./" + dist, function (exists) {
             if (exists) {
-              // 存在
-            } else {
+              // 不存在
               fs.mkdirSync("./" + dist)
             }
           })

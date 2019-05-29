@@ -2,29 +2,24 @@ const fs = require('fs');
 const copy = require('./copy');
 module.exports = function () {
   const config = JSON.parse(fs.readFileSync('./package.json'));
-  deleteFile(config.dist, config.dist); // 清出输入目录及所有文件
+  deleteFile(config.dist, config.dist); // 清空输出目录及所有文件
   deleteFile('src/css', 'src/css', 'map'); // 删除src目录css地图文件
   deleteFile('src/model/cache', 'src/model/cache'); // 清除所有缓存临时文件
-  // 创建两个文件夹
+  // 创建必须的文件夹
   mkdir('./' + config.dist);
   mkdir('./' + config.dist + '/css');
+  mkdir('./' + config.dist + '/images');
   copy('./src', "./" + config.dist, "build")
 };
 
 /* 创建目录 */
 function mkdir(dst) {
-  fs.existsSync(dst, function (exists) {
-    // 已存在
-    if (exists) {
-    }
-    // 不存在
-    else {
-      fs.mkdirSync(dst)
-    }
-  })
+  if (!fs.existsSync(dst)) {
+    fs.mkdirSync(dst)
+  }
 }
 
-/* 清出输入目录及所有文件 */
+/* 清空输出目录及所有文件 */
 function deleteFile(path, root, type) {
   let files = [];
   if (fs.existsSync(path)) {

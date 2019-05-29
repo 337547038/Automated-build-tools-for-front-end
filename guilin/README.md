@@ -1,15 +1,21 @@
 ﻿# 前端自动化构建工具
 
-一款基于Node.js的前端开发辅助工具，该工具集成了本地开发服务器、前端模块化开发管理功能、动态加载html模板、sass编译压缩、js混淆压缩、背景图片转base64 等功能，减少开发过程中不必要的重复工作，如批量查找替换公共部分、sass编译时使用Ruby中文路径报错，使用Koala有时不会自动编译等等。
+一款基于Node.js的前端开发辅助工具，该工具集成了本地开发服务器，减少开发过程中不必要的重复工作，如批量查找替换公共部分；解决使用Ruby编译sass时中文路径报错，使用Koala有时不会自动编译等问题。
 
+ - 基于webpack-dev-server服务器，每次修改代码后，浏览器可响应代码变化并自动刷新页面
+ - sass预处理器，可自动添加CSS3兼容前缀并压缩代码，让CSS的书写更加有趣与程式化
+ - 背景小图片转base64编码，减小对服务器请求
+ - CSS Sprites一键合并多张小图，并生成background-position精准定位背景。减少在开发时使用PS等工具对图片进行排列，测量计算位置 
+ - 使用uglifyjs对js混淆压缩 
+ - 模块化开发，分离公共部分，实现如后端语言般将例如头部尾部公共部分分离
+ - 动态加载html模块
+ 
 基于版本：
  - Node.js 10.7.0  
  - webpack-cli@3.1.0
  - webpack@4.16.3
  - webpack-dev-server@3.1.5
  
-
-
 
 ## 一、安装
 
@@ -44,6 +50,7 @@
          --js
          --sass
          --model   存放公共模块，如header.html
+         --sprites 需要合并的icon小图标放置目录
          --webpack webpack配置相关文件，如不需要自动刷新可删除
       -- package.json      项目配置信息
 
@@ -58,6 +65,10 @@
    4、guilin watch
    简写为 guilin w
    开启监听命令，类似于server，不同的在于它不会启动http服务。
+   
+   5、guilin sprites
+   简写为 guilin cs
+   合并小图片命令，将指定目录下的所有小图片合并为sprites.png并精准计算其对应的background-position位置。
 
 
 ## 三、配置说明
@@ -65,12 +76,13 @@
 - 一般情况无需配置，用默认的即可。
 - dist:'build' 编译生成目录，默认为空即为根目录test，如将文件打包到目录build，dist:”build”
 - port:'8090' 启动服务时的端口
-- serverIp: 用于访问的本机ip地址，开启server命令有效，不填写时只能通过 http://localhost 来访问。可为true(自动获取ip地址)或指定ip地址
+- serverIp:'' 用于访问的本机ip地址，开启server命令有效，不填写时只能通过 http://localhost 来访问。可为true(自动获取ip地址)或指定ip地址，以方便使用移动端访问调试
 - outputStype:'compressed' sass输出类型,可选nested，expanded，compact，compressed(默认)
 - autoPreFixer:true 添加css3兼容前缀，默认为true
-- uglifyjs:false 压缩js，在输入目录生成files.min.js，默认为false
+- uglifyjs:false 压缩js，在当前js目录生成files.min.js，默认为false
 - imgToBase64:false 将样式中的背景图片转为base64，默认为false
 - imgLimit:10 图片转换base64最大值，大于此值不转换，单位k
+- spritesWidth:500 小图合并后的sprites.png图的宽度
 
 ## 四、模块化开发
 

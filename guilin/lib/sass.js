@@ -47,8 +47,8 @@ function sassRender(config, dist, type, path) {
     sourceMap: map
   }, function (err, result) {
     if (err) {
-      console.log('error ' + err.line + ":" + err.column);
-      console.log(err.message)
+      console.log('\x1B[31m%s\x1B[39m', 'error ' + err.line + ":" + err.column);
+      console.log('\x1B[31m%s\x1B[39m', err.message)
     } else {
       //css内容，输出路径，类型，兼容前缀，地图，源文件路径
       autoPreFixer(result.css.toString(), dist, type, config, map, path);
@@ -68,11 +68,11 @@ function autoPreFixer(css, outPath, type, config, map, inputPath) {
       sourceMap = `\r\r/*# sourceMappingURL=${outPath.replace('./src/css/', '')}.map */`
     }
     postcss([autoprefixer])
-      .process(css, {from: inputPath, to: outPath})
-      .then(result => {
-        // writeFiles(result.css + sourceMap, outPath, log)
-        imgToBase64(result.css + sourceMap, outPath, type, config)
-      })
+    .process(css, {from: inputPath, to: outPath})
+    .then(result => {
+      // writeFiles(result.css + sourceMap, outPath, log)
+      imgToBase64(result.css + sourceMap, outPath, type, config)
+    })
   } else {
     // writeFiles(css, outPath, log)
     imgToBase64(css, outPath, type, config, type)

@@ -3,6 +3,7 @@ const sass = require("./sass");
 const cache = require("./cache");
 const puppeteer = require("./puppeteer");
 const uglifyJS = require('./uglifyJS');
+const sprites = require('./sprites');
 /* 复制文件或文件夹
 * src可以是一个文件路径，也可以是一个目录
 * dist 输出路径
@@ -45,6 +46,12 @@ function copyFile(src, dist, type, event) {
           if (event === 'change') {
             cache(src, type)
           }
+        } else if (src.indexOf('src/sprites') !== -1) {
+          // 精灵图文件夹，仅在icons里的图片文件变动时处理
+          if (src.indexOf('src/sprites/icons') !== -1) {
+            sprites(src)
+          }
+          // console.log('sprites:' + src)
         } else if (src.indexOf('.html') !== -1) {
           // 如果是html文件
           copyHtml(src, dist, type, event)
@@ -53,8 +60,7 @@ function copyFile(src, dist, type, event) {
           uglifyJS(src, dist); // 在同目录生成.min
           fs.createReadStream(src).pipe(fs.createWriteStream(dist));
           console.log(src + ' => ' + dist)
-        }
-        else {
+        } else {
           // 其他情况，直接复制
           fs.createReadStream(src).pipe(fs.createWriteStream(dist));
           console.log(src + ' => ' + dist)
@@ -149,8 +155,8 @@ function copyDirectory(src, dist, type, event) {
         }
         // 如果是目录则递归调用自身
         else if (st.isDirectory()) {
-          if (type !== 'init' && (newSrc.indexOf('src/sass') !== -1 || newSrc.indexOf('src/model') !== -1 || newSrc.indexOf('src/webpack') !== -1)) {
-            // 不创建目录
+          if (type !== 'init' && (newSrc.indexOf('src/sass') !== -1 || newSrc.indexOf('src/model') !== -1 || newSrc.indexOf('src/webpack') !== -1 || newSrc.indexOf('src/sprites') !== -1)) {
+            // 不创建目录，但对里面的文件要进行复制
             copyDirectory(newSrc, newDist, type, event)
           } else {
             exists(newSrc, newDist, copyDirectory, type, event)
@@ -163,13 +169,13 @@ function copyDirectory(src, dist, type, event) {
 
 /*判断是否存在*/
 function exists(src, dist, callback, type, event) {
-  fs.exists(dist, function (exists) {
-    // 已存在
-    if (exists) {
+  fs.access(dist, function (exists) {
+    if (!exists) {
+      // 已存在
       callback(src, dist, type, event)
     }
-    // 不存在
     else {
+      // 不存在
       fs.mkdir(dist, function () {
         callback(src, dist, type, event)
       })
