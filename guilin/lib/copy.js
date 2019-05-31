@@ -4,6 +4,7 @@ const cache = require("./cache");
 const puppeteer = require("./puppeteer");
 const uglifyJS = require('./uglifyJS');
 const sprites = require('./sprites');
+const beautify = require('js-beautify');
 /* 复制文件或文件夹
 * src可以是一个文件路径，也可以是一个目录
 * dist 输出路径
@@ -48,7 +49,7 @@ function copyFile(src, dist, type, event) {
           }
         } else if (src.indexOf('src/sprites') !== -1) {
           // 精灵图文件夹，仅在icons里的图片文件变动时处理
-          if (src.indexOf('src/sprites/icons') !== -1) {
+          if (src.indexOf('src/sprites/icons') !== -1 && type !== 'build') {
             sprites(src)
           }
           // console.log('sprites:' + src)
@@ -58,8 +59,10 @@ function copyFile(src, dist, type, event) {
         } else if (src.indexOf('.js') !== -1) {
           // 是js文件
           uglifyJS(src, dist); // 在同目录生成.min
-          fs.createReadStream(src).pipe(fs.createWriteStream(dist));
-          console.log(src + ' => ' + dist)
+          // 复制js并格式化
+          // fs.createReadStream(src).pipe(fs.createWriteStream(dist));
+          // console.log(src + ' => ' + dist)
+          copyJs(src, dist)
         } else {
           // 其他情况，直接复制
           fs.createReadStream(src).pipe(fs.createWriteStream(dist));
@@ -115,7 +118,24 @@ function copyHtml(src, dist, type, event) {
       // 如果是运行了服务命令过来的，则在页面中添加一段js脚本
       dataReplace += '<script type="text/javascript" src="/bundle.js"></script>';
     }
-    fs.writeFile(dist, dataReplace, {
+    // 格式化输出
+    const opt = {
+      "indent_size": 2,
+      "extra_liners": '' // List of tags (defaults to [head,body,/html] that should have an extra newline before them.
+    };
+    fs.writeFile(dist, beautify.html(dataReplace, opt), {
+      encoding: 'utf8'
+    }, function (err) {
+      if (err) throw err;
+      console.log(src + ' => ' + dist)
+    })
+  })
+}
+
+/* 复制并格式化 js */
+function copyJs(src, dist) {
+  fs.readFile(src, {encoding: 'utf8'}, function (err, data) {
+    fs.writeFile(dist, beautify(data, {indent_size: 2}), {
       encoding: 'utf8'
     }, function (err) {
       if (err) throw err;

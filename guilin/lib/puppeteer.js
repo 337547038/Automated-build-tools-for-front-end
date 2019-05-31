@@ -1,6 +1,5 @@
 const puppeteer = require('puppeteer');
 const fs = require("fs");
-const pretty = require('pretty');
 module.exports = async function (filename, callback) {
   const browser = await puppeteer.launch();
   const page = await browser.newPage();
@@ -12,7 +11,7 @@ module.exports = async function (filename, callback) {
     return document.getElementById('page').innerHTML
   });
 
-  fs.writeFile('./src/model/cache/' + encodeURIComponent(filename), pretty(dimensions), {
+  fs.writeFile('./src/model/cache/' + encodeURIComponent(filename), dimensions, {
     encoding: 'utf8'
   }, function () {
     console.log('./src/model/cache/' + filename);

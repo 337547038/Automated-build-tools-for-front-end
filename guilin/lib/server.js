@@ -53,8 +53,8 @@ function portIsOccupied(port, url, callback) {
 }
 // 获取本机ip地址
 function getIPAdress() {
-  var interfaces = os.networkInterfaces();
-  for (var devName in interfaces) {
+  const interfaces = os.networkInterfaces();
+  for (let devName in interfaces) {
     const iface = interfaces[devName];
     for (let i = 0; i < iface.length; i++) {
       const alias = iface[i];

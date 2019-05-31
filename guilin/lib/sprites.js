@@ -75,6 +75,16 @@ function render(path, hasList) {
 function writeFile(hasList) {
   // 目录时只写入一次
   if (total === 0) {
+    // 对tempArray排序，将高度差不多的放一行，减少行与行的间距
+    tempArray.sort(function (a, b) {
+      if (a.height < b.height) {
+        return -1;
+      }
+      if (a.height > b.height) {
+        return 1;
+      }
+      return 0;
+    });
     // 合并两个数组
     hasList.push.apply(hasList, tempArray);
     // 计算生成图的大小，宽固定为500
@@ -83,6 +93,7 @@ function writeFile(hasList) {
     let maxHeight = 0;// 当前行最大高度，换行时要回0
     const spacing = 5; // 两张图片间的间距
     let demoContent = '';
+    let demoStyle = '';
     // 读取配置信息
     const config = JSON.parse(fs.readFileSync('./package.json'));
     const canvasWidth = config.spritesWidth;
@@ -94,18 +105,20 @@ function writeFile(hasList) {
         maxHeight = 0;
         // 如果xy没有时才重写
         item.x = item.x || 0;
-        item.y = item.y || usedHeight
       } else {
         item.x = item.x || usedWidth;
-        item.y = item.y || usedHeight;
-        usedWidth += item.width;
         if (item.height > maxHeight) {
           maxHeight = item.height
         }
       }
+      item.y = item.y || usedHeight;
+      usedWidth += item.width + spacing;
       const x = item.x ? `-${item.x}px` : 0;
       const y = item.y ? `-${item.y}px` : 0;
-      demoContent += `\r<li><i style="height: ${item.height}px;width: ${item.width}px;background-position:${x} ${y}"></i>${item.path}<span>background-position:${x} ${y}</span></li>`
+      // demoContent += `\r<li><i style="height: ${item.height}px;width: ${item.width}px;background-position:${x} ${y}"></i>${item.path}<span>background-position:${x} ${y}</span></li>`
+      const className = `sprites-${item.path.replace('.jpg', '').replace('.png', '')}`;
+      demoContent += `\r<li><i class="${className}"></i>${item.path}<span>background-position:${x} ${y}</span><span>${className}</span></li>`;
+      demoStyle += `\r.${className}{ background-position: ${x} ${y};width: ${item.width}px;height: ${item.height}px }`;
     });
     // 读取sprites下的index.html，替换内容重写
     // const indexHtml = spritesPath + '/index.html';
@@ -118,7 +131,7 @@ function writeFile(hasList) {
         });*/
         data = data.replace(/(?<=<span\sclass="total">)[\s\S]*?(?=<\/span>)/, hasList.length);
         data = data.replace(/(?<=<ul\sclass="demo">)[\s\S]*?(?=<\/ul>)/, demoContent);
-        //data = data.replace('{{demoContent}}', demoContent).replace('{{total}}', hasList.length);
+        data = data.replace(/{{demoStyle}}/g, demoStyle);
         const outPath = spritesPath + '/index.html';
         fs.writeFile(outPath, data, function (err) {
           if (err) throw err;
@@ -166,10 +179,15 @@ function savePng(len, canvas, configDist) {
     const buildImage = srcImage.replace('src', configDist);
     const out = fs.createWriteStream(srcImage + pngName);
     const stream = canvas.createPNGStream();
-    if (fs.existsSync(srcImage)) {
-      stream.pipe(out);
-      stream.pipe(fs.createWriteStream(buildImage + pngName)); // 再复制到输出目录
+    // 输出目录不存在时，先创建
+    if (!fs.existsSync(srcImage)) {
+      fs.mkdirSync(srcImage)
     }
+    if (!fs.existsSync(buildImage)) {
+      fs.mkdirSync(buildImage)
+    }
+    stream.pipe(out);
+    stream.pipe(fs.createWriteStream(buildImage + pngName)); // 再复制到输出目录
     out.on('finish', () => console.log('The css sprites PNG file was created =>' + srcImage + pngName + ' and ' + buildImage + pngName))
   }
 }
