@@ -4,46 +4,77 @@ const build = require('../lib/build.js');
 const watch = require('../lib/watch.js');
 const server = require('../lib/server.js');
 const sprites = require('../lib/sprites.js');
+const stylelint = require('../lib/stylelint.js');
+const htmlhint = require('../lib/htmlhint.js');
 const program = require('commander');
 program
-.command('init')
-.alias('i')
-.description('')
-.action(function (name) {
-  init();
-  //process.exit(0);
-});
+  .command('help')
+  .alias('h')
+  .description('')
+  .action(function (name) {
+    console.log('-init -i 初始化，项目存在时则重写package.json');
+    console.log('-build -b 编译打包');
+    console.log('-watch -w 开启监听命令');
+    console.log('-server -s 启动本地开发调试服务器');
+    console.log('-sprites -cs 合并生成css精灵图');
+    console.log('-stylelint -sl scss代码检查');
+    console.log('-htmlhint -hl html代码检查');
+    //process.exit(0);
+  });
 program
-.command('build')
-.alias('b')
-.description('')
-.action(function () {
-  build();
-  //process.exit(0);
-});
+  .command('init')
+  .alias('i')
+  .description('')
+  .action(function (name) {
+    init();
+    //process.exit(0);
+  });
 program
-.command('server')
-.alias('s')
-.description('')
-.action(function () {
-  server();
-  // process.exit(0);
-});
+  .command('build')
+  .alias('b')
+  .description('')
+  .action(function () {
+    build();
+    //process.exit(0);
+  });
 program
-.command('watch')
-.alias('w')
-.description('')
-.action(function () {
-  watch();
-  //process.exit(0);
-});
+  .command('server')
+  .alias('s')
+  .description('')
+  .action(function () {
+    server();
+    // process.exit(0);
+  });
 program
-.command('sprites')
-.alias('cs')
-.description('')
-.action(function () {
-  sprites();
-  //process.exit(0);
-});
-
+  .command('watch')
+  .alias('w')
+  .description('')
+  .action(function () {
+    watch();
+    //process.exit(0);
+  });
+program
+  .command('sprites')
+  .alias('cs')
+  .description('')
+  .action(function () {
+    sprites();
+    //process.exit(0);
+  });
+program
+  .command('stylelint')
+  .alias('sl')
+  .description('')
+  .action(function () {
+    stylelint();
+    //process.exit(0);
+  });
+program
+  .command('htmlhint')
+  .alias('hl')
+  .description('')
+  .action(function () {
+    htmlhint();
+    //process.exit(0);
+  });
 program.parse(process.argv);

@@ -7,10 +7,12 @@
     "canvas": "^2.5.0",
     "chokidar": "^3.0.0",
     "commander": "^2.20.0",
-    "js-beautify": "^1.10.0",
+    "htmlhint": "^0.11.0",
     "node-sass": "^4.12.0",
     "postcss": "^7.0.16",
-    "puppeteer": "^1.16.0",
-    "uglify-js": "^3.5.14"
+    "pretty": "^2.0.0",
+    "puppeteer": "^1.17.0",
+    "stylelint": "^10.0.1",
+    "uglify-js": "^3.5.15"
   }
 }

@@ -12,6 +12,7 @@
  - 模块化开发，分离公共部分，实现如后端语言般将例如头部尾部公共部分分离
  - 动态加载html模块
  - html/js文件格式化
+ - html/css代码质量检查
  
 基于版本：
  - Node.js 10.7.0  
@@ -72,6 +73,14 @@
    5、guilin sprites
    简写为 guilin cs
    合并小图片命令，将指定目录下的所有小图片合并为sprites.png并精准计算其对应的background-position位置。
+   
+   6、guilin stylelint
+      简写为 guilin sl
+      scss样式代码质量检查
+      
+   7、guilin htmlhint
+      简写为 guilin hl
+      检查html代码质量 
 
 
 ## 三、配置说明
