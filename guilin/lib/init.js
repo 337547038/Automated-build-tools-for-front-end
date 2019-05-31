@@ -16,7 +16,7 @@ module.exports = function () {
     imgToBase64: false,// 将样式中的背景图片转为base64
     imgLimit: 10, // 图片转换base64最大值，大于此值不转换，单位k
     spritesWidth: 500, // css sprites图片的宽
-    LintExclude: ['model', 'font', 'sprites'], // html代码检查时排除的目录
+    lintExclude: ['model', 'font', 'sprites'], // html代码检查时排除的目录
     scripts: {
       "build": "guilin build",
       "watch": "guilin watch",

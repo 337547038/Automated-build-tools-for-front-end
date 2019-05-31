@@ -25,7 +25,7 @@ const searchHtmlFiles = function (src) {
           }
         } else if (st.isDirectory()) {
           // const exclude = ['model', 'font','sprites'];
-          const exclude = config.LintExclude;
+          const exclude = config.lintExclude;
           if (exclude.indexOf(path) === -1) {
             // console.log(path)
             searchHtmlFiles(newSrc);
