@@ -6,10 +6,10 @@ const HTMLHint = require("htmlhint");
 // https://github.com/htmlhint/HTMLHint/wiki/Usage
 let pass = true;
 let timer = '';
-const config = JSON.parse(fs.readFileSync('./package.json'));
 const searchHtmlFiles = function (src) {
   if (!src) {
     src = './src';
+    const config = JSON.parse(fs.readFileSync('./package.json'));
     console.log('Please wait...');
   }
   fs.readdir(src, function (err, paths) {
