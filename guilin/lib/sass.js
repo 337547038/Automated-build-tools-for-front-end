@@ -68,11 +68,11 @@ function autoPreFixer(css, outPath, type, config, map, inputPath) {
       sourceMap = `\r\r/*# sourceMappingURL=${outPath.replace('./src/css/', '')}.map */`
     }
     postcss([autoprefixer])
-    .process(css, {from: inputPath, to: outPath})
-    .then(result => {
-      // writeFiles(result.css + sourceMap, outPath, log)
-      imgToBase64(result.css + sourceMap, outPath, type, config)
-    })
+      .process(css, {from: inputPath, to: outPath})
+      .then(result => {
+        // writeFiles(result.css + sourceMap, outPath, log)
+        imgToBase64(result.css + sourceMap, outPath, type, config)
+      })
   } else {
     // writeFiles(css, outPath, log)
     imgToBase64(css, outPath, type, config, type)
@@ -113,29 +113,34 @@ function imgToBase64(content, dist, type, config) {
         return `url(${m1})`
       }
     });
-    writeFiles(dataReplace, dist, log);
-    if (type === 'build') {
+    writeFiles(dataReplace, dist, log, outPath, type);
+    /*if (type === 'build') {
       // 生成后复制一份到输出目录
       fs.createReadStream(dist).pipe(fs.createWriteStream(outPath))
-    }
+    }*/
   } else {
-    writeFiles(content, dist, log);
-    if (type === 'build') {
+    writeFiles(content, dist, log, outPath, type);
+    /*if (type === 'build') {
       // 生成后复制一份到输出目录
       fs.createReadStream(dist).pipe(fs.createWriteStream(outPath))
-    }
+    }*/
   }
 }
 
-function writeFiles(content, filename, log) {
+function writeFiles(content, filename, log, outPath, type) {
   fs.writeFile(filename, content, {
     encoding: 'utf8'
   }, function (err) {
     if (err) {
-      throw err
+      throw err;
     }
     if (log) {
       console.log(filename + " " + new Date().toLocaleTimeString())
+    }
+    if (type === 'build') {
+      // 生成后复制一份到输出目录
+      // console.log('\x1B[33m%s\x1B[39m', '编译成功')
+      fs.createReadStream(filename).pipe(fs.createWriteStream(outPath))
     }
   })
 }

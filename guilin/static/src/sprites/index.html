@@ -4,38 +4,97 @@
   <meta charset="UTF-8">
   <title>css sprites</title>
   <style>
-    body, div, ul, li, pre{margin: 0;padding: 0}
-    body{padding: 0 20px}
-    ul, li{font-style: normal}
+    body, div, ul, li, pre, i{margin: 0;padding: 0}
+    body{color: #333;font-size: 16px;}
+    ul, li{list-style: none}
+    a{text-decoration: none;color: #333;font-size: 16px;}
     h1{text-align: center;}
-    pre{padding: 10px;display: inline-block;background: #ddd;color: red;font-size: 18px;line-height: 25px}
-    .demo li{display: flex;align-items: center;border-bottom: 1px solid #ddd;padding-bottom: 15px;margin-bottom: 15px;color: #999;}
-    .demo i{display: inline-block;margin-right: 20px;}
-    .demo span{margin-left: 20px;color: #333;}
-    .total{color: red}
-    /*以下为所需样式*/
-    [class*="sprites-"]{background-image: url(../images/sprites.png); display: inline-block; vertical-align: middle}
-    {{demoStyle}}
+    .container{margin: 0 auto;width: 80%;}
+    .tab{border-bottom: 1px solid #eee;}
+    .tab li{cursor: pointer;width: 100px;height: 40px;line-height: 40px;text-align: center;border-bottom: 2px solid transparent;position: relative;z-index: 1;margin-bottom: -1px;color: #666;display: inline-block;vertical-align: top}
+    .tab .active{border-bottom-color: #f00;}
+    .tab-content .tab-pane{display: none}
+    .tab-content .tab-pane.active{display: block}
+    .red{color: red}
+    .css{color: red;background: #f2f2f2;padding: 10px;line-height: 25px;margin-bottom: 20px;white-space: pre-wrap}
+    .list li{display: flex;align-items: center;border-bottom: 1px solid #ddd;margin-bottom: 15px;color: #999;padding-bottom: 15px;}
+    .list li i{display: inline-block;margin-right: 20px;}
+    .list li span{margin-left: 20px;color: #333;}
+    .list li span:nth-child(1){color: #999;}
+    .tips{margin-bottom: 10px;}
+    /*demo-before*/
+    .demo-before [class*="sprites-"]{line-height: 100%}
+    .demo-before [class*="sprites-"]:before{content: '';background-image: url(../images/sprites.png); display: inline-block;vertical-align: middle;}
+    {{demoBeforeStyle1}}
+    /*demo-normal*/
+    .demo-normal [class*="sprites-"]{background-image: url(../images/sprites.png); display: inline-block; vertical-align: middle}
+    {{demoNormalStyle1}}
   </style>
+  <script src="../js/jquery-1.12.4.min.js"></script>
+  <script>
+    $(function () {
+      $('.tab li').click(function () {
+        var cl = 'active';
+        $(this).addClass(cl).siblings().removeClass(cl);
+        $('.tab-content .tab-pane').removeClass(cl).eq($(this).index()).addClass(cl);
+      })
+    })
+  </script>
 </head>
 <body>
 <h1>Css Sprites</h1>
-<h3>复制以下css样式到项目样式表</h3>
-<pre>
-[class*="sprites-"]{background-image: url(../images/sprites.png); display: inline-block; vertical-align: middle}{{demoStyle}}
-</pre>
-<div>
-  <h3>共 <span class="total">0</span> 个图片</h3>
-  <ul class="demo">
-  </ul>
-</div>
-<div class="intro">
-  <h3>使用说明：</h3>
-  <p>1、将所有需要合并的图片放在目录./src/sprites/icons下；</p>
-  <p>2、运行命令guilin sprites即可将所有指定的图片合并为sprites.png；新增图片时执行命令即可；</p>
-  <p>3、仅支持jpg和png两种格式，并且不支持中文命名；</p>
-  <p>4、如需重新生成，请手动删除文件./src/sprites/icons.json后重执行合并命令，重新生成后图片位置会发生变化，请慎重</p>
-  <p>5、将红色样式复制到项目样式，再显示图标位置添加对应class</p>
+<div class="container">
+  <div class="tab">
+    <ul>
+      <li class="active"><a href="javascript:;">伪类引用</a></li>
+      <li><a href="javascript:;">常规引用</a></li>
+      <li><a href="javascript:;">移动端</a></li>
+    </ul>
+  </div>
+  <div class="tab-content">
+    <h3>共 <span class="red">{{total}}</span> 个图标</h3>
+    <div class="tab-pane demo-before active">
+      <div class="tips">跟字体图标用法一致</div>
+      <pre class="css">
+[class*="sprites-"]{line-height: 100%}
+[class*="sprites-"]:before{content: '';background-image: url(../images/sprites.png); display: inline-block;vertical-align: middle;}
+{{demoBeforeStyle2}}</pre>
+      <div class="list">
+        <ul>
+          {{demoContent}}
+        </ul>
+      </div>
+    </div>
+    <div class="tab-pane demo-normal">
+      <pre class="css">
+[class*="sprites-"]{background-image: url(../images/sprites.png); display: inline-block; vertical-align: middle;}
+{{demoNormalStyle2}}</pre>
+      <div class="list">
+        <ul>
+          {{demoContent}}
+        </ul>
+      </div>
+    </div>
+    <div class="tab-pane demo-phone">
+      <div class="tips">移动端使用rem或vw/vh等其它单位时，通过scss的function转换</div>
+      <pre class="css">
+[class*="sprites-"]:before{background-image: url(../images/sprites.png); display: flex;align-items: center; vertical-align: middle;background-size: {{backgroundSize}}}
+{{demoPhoneStyle1}}</pre>
+      <div class="list">
+        因需转换单位，这里不显示示例
+      </div>
+    </div>
+  </div>
+  <div>
+  </div>
+  <div class="intro">
+    <h3>使用说明：</h3>
+    <p>1、将所有需要合并的图片放在目录./src/sprites/icons下；</p>
+    <p>2、运行命令guilin sprites即可将所有指定的图片合并为sprites.png；新增图片时执行命令即可；</p>
+    <p>3、仅支持jpg和png两种格式，并且不支持中文命名；</p>
+    <p>4、如需重新生成，请手动删除文件./src/sprites/icons.json后重执行合并命令，重新生成后图片位置会发生变化，请慎重</p>
+    <p>5、将红色样式复制到项目样式，在需显示图标位置添加对应class</p>
+  </div>
 </div>
 </body>
 </html>

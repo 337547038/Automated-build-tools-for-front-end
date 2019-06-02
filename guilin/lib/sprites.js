@@ -93,7 +93,9 @@ function writeFile(hasList) {
     let maxHeight = 0;// 当前行最大高度，换行时要回0
     const spacing = 5; // 两张图片间的间距
     let demoContent = '';
-    let demoStyle = '';
+    let demoBeforeStyle1 = '';
+    let demoBeforeStyle2 = '';
+    let demoPhoneStyle1 = '';
     // 读取配置信息
     const config = JSON.parse(fs.readFileSync('./package.json'));
     const canvasWidth = config.spritesWidth;
@@ -115,23 +117,37 @@ function writeFile(hasList) {
       usedWidth += item.width + spacing;
       const x = item.x ? `-${item.x}px` : 0;
       const y = item.y ? `-${item.y}px` : 0;
-      // demoContent += `\r<li><i style="height: ${item.height}px;width: ${item.width}px;background-position:${x} ${y}"></i>${item.path}<span>background-position:${x} ${y}</span></li>`
+      // 写示例
       const className = `sprites-${item.path.replace('.jpg', '').replace('.png', '')}`;
       demoContent += `\r<li><i class="${className}"></i>${item.path}<span>background-position:${x} ${y}</span><span>${className}</span></li>`;
-      demoStyle += `\r.${className}{ background-position: ${x} ${y};width: ${item.width}px;height: ${item.height}px }`;
+      const style = `{ background-position: ${x} ${y};width: ${item.width}px;height: ${item.height}px }`;
+      demoBeforeStyle1 += `.demo-before .${className}:before${style}\r`; // 写于style里用于展示的
+      demoBeforeStyle2 += `.${className}:before${style}\r`; // 用于显示的
+      //.sprites-adicon:before{ background-position: px(-23px) px(-30);width: px(22);height: px(11 }
+      // 移动端的
+      const xx = item.x ? `px(-${item.x})` : 0;
+      const yy = item.y ? `px(-${item.y})` : 0;
+      demoPhoneStyle1 += `.${className}:before{ background-position: ${xx} ${yy};width: px(${item.width});height: px(${item.height}) }\r`
     });
+    const canvasHeight = usedHeight + maxHeight;
     // 读取sprites下的index.html，替换内容重写
     // const indexHtml = spritesPath + '/index.html';
     const indexHtml = __dirname.replace("lib", "static/src/sprites") + '/index.html';
     if (fs.existsSync(indexHtml)) {
       fs.readFile(indexHtml, {encoding: 'utf8'}, function (err, data) {
-        /*const dataReplace = data.replace(/<ul\sclass="demo">([\s\S]*?)<\/ul>/g, function (matchs, m1) {
-          console.log(m1)
-          return demoContent
-        });*/
-        data = data.replace(/(?<=<span\sclass="total">)[\s\S]*?(?=<\/span>)/, hasList.length);
-        data = data.replace(/(?<=<ul\sclass="demo">)[\s\S]*?(?=<\/ul>)/, demoContent);
-        data = data.replace(/{{demoStyle}}/g, demoStyle);
+        // data = data.replace(/(?<=<span\sclass="total">)[\s\S]*?(?=<\/span>)/, hasList.length);
+        // data = data.replace(/(?<=<ul\sclass="demo">)[\s\S]*?(?=<\/ul>)/, demoContent);
+        // data = data.replace(/{{demoStyle}}/g, demoStyle);
+        const demoNormalStyle1 = demoBeforeStyle1.replace(/demo-before/g, 'demo-normal').replace(/:before/g, '');
+        const demoNormalStyle2 = demoBeforeStyle2.replace(/:before/g, '');
+        data = data.replace(/{{total}}/, hasList.length)
+          .replace(/{{demoContent}}/g, demoContent)
+          .replace(/{{demoBeforeStyle1}}/, demoBeforeStyle1)
+          .replace(/{{demoBeforeStyle2}}/, demoBeforeStyle2)
+          .replace(/{{demoNormalStyle1}}/, demoNormalStyle1)
+          .replace(/{{demoNormalStyle2}}/, demoNormalStyle2)
+          .replace(/{{demoPhoneStyle1}}/, demoPhoneStyle1)
+          .replace(/{{backgroundSize}}/, `px(${canvasWidth}) px(${canvasHeight})`);
         const outPath = spritesPath + '/index.html';
         fs.writeFile(outPath, data, function (err) {
           if (err) throw err;
@@ -148,7 +164,6 @@ function writeFile(hasList) {
       // 清空
       tempArray = []
     });
-    const canvasHeight = usedHeight + maxHeight;
     const canvas = createCanvas(canvasWidth, canvasHeight);
     const ctx = canvas.getContext('2d');
     drawImage(hasList, ctx, canvas, config.dist)

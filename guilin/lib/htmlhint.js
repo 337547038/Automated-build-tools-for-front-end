@@ -9,7 +9,8 @@ let timer = '';
 const config = JSON.parse(fs.readFileSync('./package.json'));
 const searchHtmlFiles = function (src) {
   if (!src) {
-    src = './src'
+    src = './src';
+    console.log('Please wait...');
   }
   fs.readdir(src, function (err, paths) {
     paths.forEach(function (path) {
