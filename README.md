@@ -13,6 +13,7 @@
  - 动态加载html模块
  - html/js文件格式化
  - html/css代码质量检查
+ - html保存快照截图
  
 基于版本：
  - Node.js 10.7.0  
@@ -75,12 +76,16 @@
    合并小图片命令，将指定目录下的所有小图片合并为sprites.png并精准计算其对应的background-position位置。
    
    6、guilin stylelint
-      简写为 guilin sl
-      scss样式代码质量检查
-      
+   简写为 guilin sl
+   src/sass/*.scss进行检查，主要检查一些拼写错误
+   
    7、guilin htmlhint
-      简写为 guilin hl
-      检查html代码质量 
+   简写为 guilin hl
+   对html文件进行质量检查，并可保存页面快照截图
+   
+   8、guilin help
+   简写为 guilin h
+   输出帮助信息
 
 
 ## 三、配置说明
@@ -95,7 +100,11 @@
 - imgToBase64:false 将样式中的背景图片转为base64，默认为false
 - imgLimit:10 图片转换base64最大值，大于此值不转换，单位k
 - spritesWidth:500 小图合并后的sprites.png图的宽度
-- lintExclude: ['model', 'font', 'sprites'] html代码检查时排除的目录
+- codeCheck: {
+-  // 代码质量检查
+-   lintExclude: ['model', 'font', 'sprites'], // html代码检查时排除的目录
+-   screenshots: true, // 检查时是否拍照截图
+-   isMobile: false // 是否模拟手机端拍照截图，移动端项目时设为true}
 
 ## 四、模块化开发
 
@@ -142,5 +151,5 @@
 
    1、打包下载360会提示有木马，可能是因为使用了NodeJS的fs文件系统。因为要对文件进行复制粘贴修改等，请放心使用；
 
-   2、使用过程有疑问请留言。
+   2、使用过程有疑问请留言，https://github.com/337547038/Automated-build-tools-for-front-end
 

@@ -1,47 +1,81 @@
 /**
- * Created by 337547038 html检查
+ * Created by 337547038
+ * 2019
+ * https://github.com/337547038/Automated-build-tools-for-front-end
  */
 const fs = require('fs');
-const HTMLHint = require("htmlhint");
+const htmlhint = require("htmlhint");
 // https://github.com/htmlhint/HTMLHint/wiki/Usage
+const puppeteer = require('puppeteer');
+const iPhone = puppeteer.devices['iPhone 8'];
 let pass = true;
 let timer = '';
-const searchHtmlFiles = function (src) {
-  if (!src) {
-    src = './src';
-    const config = JSON.parse(fs.readFileSync('./package.json'));
-    console.log('Please wait...');
+let config = {};
+let tempHtml = [];
+
+const searchHtmlFiles = async function () {
+  console.time('usedTime');
+  config = JSON.parse(fs.readFileSync('./package.json'));
+  console.log(`Check path ./${config.dist}, Please wait...`);
+  searchHtml(config.dist);
+  if (config.codeCheck.screenshots) {
+    console.log('Saving screenshots...');
+    const savePath = config.dist + '/screenshots';
+    if (!fs.existsSync(savePath)) {
+      fs.mkdirSync(savePath)
+    }
+    const browser = await puppeteer.launch();
+    const page = await browser.newPage();
+    page.setViewport({
+      width: 1920,
+      height: 720
+    });
+    if (config.codeCheck.isMobile) {
+      // 模拟手机
+      await page.emulate(iPhone);
+    }
+    const path = 'file:///' + process.cwd().replace(/\\/g, '/');
+    // 遍历tempHtml，对所有页面拍照
+    for (let i = 0; i < tempHtml.length; i++) {
+      const item = tempHtml[i];
+      const url = path + '/' + item;
+      await page.goto(url);
+      await page.screenshot({
+        path: savePath + '/' + item.replace(config.dist + "/", '').replace(/\//g, '-').replace('.html', '.jpg'),
+        type: 'jpeg',
+        fullPage: true
+      });
+    }
+    await browser.close();
+    console.timeEnd('usedTime');
   }
-  fs.readdir(src, function (err, paths) {
-    paths.forEach(function (path) {
-      const newSrc = src + '/' + path;
-      fs.stat(newSrc, function (err, st) {
-        if (err) {
-          throw err
-        }
-        if (st.isFile()) {
-          if (newSrc.indexOf('.html') !== -1) {
-            // console.log(newSrc)
-            htmlFile(newSrc)
-          }
-        } else if (st.isDirectory()) {
-          // const exclude = ['model', 'font','sprites'];
-          const exclude = config.lintExclude;
-          if (exclude.indexOf(path) === -1) {
-            // console.log(path)
-            searchHtmlFiles(newSrc);
-          }
-        }
-      })
-    })
-  })
 };
+
+/*同步递归遍历，提取所有html文件*/
+function searchHtml(src) {
+  fs.readdirSync(src).forEach(item => {
+    const newSrc = src + '/' + item;
+    const stat = fs.statSync(newSrc);
+    if (stat.isFile()) {
+      if (newSrc.indexOf('.html') !== -1) {
+        tempHtml.push(newSrc);
+        // 代码检查
+        htmlFile(newSrc)
+      }
+    } else if (stat.isDirectory()) {
+      const exclude = config.codeCheck.lintExclude;
+      if (exclude.indexOf(item) === -1) {
+        searchHtml(newSrc);
+      }
+    }
+  })
+}
 
 function htmlFile(src) {
   // https://github.com/htmlhint/HTMLHint/wiki/Rules
   const rules = {/*"inline-style-disabled": true*/};
   fs.readFile(src, {encoding: 'utf8'}, function (err, data) {
-    const messages = HTMLHint.default.verify(data, rules);
+    const messages = htmlhint.default.verify(data, rules);
     if (messages.length > 0) {
       pass = false;
       console.log('\x1B[33m%s\x1B[39m', src);
@@ -50,7 +84,7 @@ function htmlFile(src) {
     clearTimeout(timer);
     if (pass) {
       timer = setTimeout(() => {
-        console.log('检验通过')
+        console.log('HtmlCode check passed.')
       }, 2000)
     }
   })

@@ -1,3 +1,8 @@
+/**
+ * Created by 337547038
+ * 2019
+ * https://github.com/337547038/Automated-build-tools-for-front-end
+ */
 const fs = require("fs");
 const config = require("../package.json");
 const copy = require('./copy');
@@ -16,7 +21,12 @@ module.exports = function () {
     imgToBase64: false,// 将样式中的背景图片转为base64
     imgLimit: 10, // 图片转换base64最大值，大于此值不转换，单位k
     spritesWidth: 500, // css sprites图片的宽
-    lintExclude: ['model', 'font', 'sprites'], // html代码检查时排除的目录
+    codeCheck: {
+      // 代码质量检查
+      lintExclude: ['model', 'font', 'sprites'], // html代码检查时排除的目录
+      screenshots: true, // 检查时是否拍照截图
+      isMobile: false // 是否模拟手机端拍照截图，移动端项目时设为true
+    },
     scripts: {
       "build": "guilin build",
       "watch": "guilin watch",

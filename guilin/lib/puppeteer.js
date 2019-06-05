@@ -1,3 +1,8 @@
+/**
+ * Created by 337547038
+ * 2019
+ * https://github.com/337547038/Automated-build-tools-for-front-end
+ */
 const puppeteer = require('puppeteer');
 const fs = require("fs");
 module.exports = async function (filename, callback) {
@@ -5,7 +10,7 @@ module.exports = async function (filename, callback) {
   const browser = await puppeteer.launch();
   const page = await browser.newPage();
 
-  const url = 'file://' + process.cwd().replace(/\\/g, '/') + path + filename;
+  const url = 'file:///' + process.cwd().replace(/\\/g, '/') + path + filename;
   // 取问号前的
   const file = filename.substr(0, filename.indexOf('?'));
   if (!fs.existsSync(path + file)) {

@@ -1,5 +1,7 @@
 /**
- * Created by 337547038 css检查
+ * Created by 337547038
+ * 2019
+ * https://github.com/337547038/Automated-build-tools-for-front-end
  */
 const fs = require('fs');
 const stylelint = require("stylelint");

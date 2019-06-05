@@ -1,3 +1,8 @@
+/**
+ * Created by 337547038
+ * 2019
+ * https://github.com/337547038/Automated-build-tools-for-front-end
+ */
 const fs = require("fs");
 const exec = require('child_process').exec;
 const net = require('net');
