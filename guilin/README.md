@@ -38,7 +38,7 @@
 
    以上安装可参内容中的图片1.jpg。  
  ### 安装方法2：  
-安装在其他位置，例如将clone下来的文件放`D:\guilin`; 
+安装在其他位置，例如将clone下来的文件放`D:\guilin`;   
 2.2、进入`D:\guilin`， 执行`npm install`命令安装依懒。  
 2.3、添加系统环境变量，添加`D:\guilin`  
 2.4、删除`guilin.cmd`,将`guilin.bak.cmd`重命名为`guilin.cmd`。  

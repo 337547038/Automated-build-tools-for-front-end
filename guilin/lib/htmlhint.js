@@ -33,6 +33,10 @@ const searchHtmlFiles = async function () {
     if (config.codeCheck.isMobile) {
       // 模拟手机
       await page.emulate(iPhone);
+      page.setViewport({
+        width: 750,
+        height: 1366
+      });
     }
     const path = 'file:///' + process.cwd().replace(/\\/g, '/');
     // 遍历tempHtml，对所有页面拍照
