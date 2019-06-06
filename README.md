@@ -30,15 +30,23 @@
    - npm install -g webpack
    - npm install -g webpack-dev-server
    - npm install -g webpack-cli
-
-2、将文件夹`guilin`复制到以下路径`C:\Users\当前用户名\AppData\Roaming\npm\node_modules`，
+### 安装方法1：  
+1.2、将文件夹`guilin`复制到以下路径`C:\Users\当前用户名\AppData\Roaming\npm\node_modules`，
    然后进入`C:\Users\当前用户名\AppData\Roaming\npm\node_modules\guilin`目录，执行`npm install`命令安装依懒。
 
-3、最重要的一点：将目录下的`guilin.cmd`复制到以下目录`C:\Users\当前用户名\AppData\Roaming\npm`，才能使用下面的所有命令。
+1.3、最重要的一点：将目录下的`guilin.cmd`复制到以下目录`C:\Users\当前用户名\AppData\Roaming\npm`，才能使用下面的所有命令。
+
+   以上安装可参内容中的图片1.jpg。  
+ ### 安装方法2：  
+安装在其他位置，例如将clone下来的文件放`D:\guilin`; 
+2.2、进入`D:\guilin`， 执行`npm install`命令安装依懒。  
+2.3、添加系统环境变量，添加`D:\guilin`  
+2.4、删除`guilin.cmd`,将`guilin.bak.cmd`重命名为`guilin.cmd`。  
+安装方法2可参考图2.jpg  
 
    目录下包含了static文件夹，guilin init初始化时会将目录下的文件复制到当前项目目录，因此可以将一些常用的脚本样式图片等放到对应的目录去，初始化时就不用再次复制了。
 
-   以上安装可参内容中的图片。
+   
 
 ## 二、使用
 
@@ -59,33 +67,33 @@
          --webpack webpack配置相关文件，如不需要自动刷新可删除
       -- package.json      项目配置信息
 
-  2、guilin build
-   简写为guilin b
-   此命令可将src下的文件编译并复制到指定目录下如build。
+  2、guilin build  
+   简写为guilin b  
+   此命令可将src下的文件编译并复制到指定目录下如build。  
 
-   3、guilin server
-   简写为 guilin s
-   启动服务，执行后可在浏览器输入 http://localhost:8080 查看页面，修改了源文件会自动刷新页面。
+   3、guilin server  
+   简写为 guilin s  
+   启动服务，执行后可在浏览器输入 http://localhost:8080 查看页面，修改了源文件会自动刷新页面。  
 
-   4、guilin watch
-   简写为 guilin w
-   开启监听命令，类似于server，不同的在于它不会启动http服务。
+   4、guilin watch  
+   简写为 guilin w  
+   开启监听命令，类似于server，不同的在于它不会启动http服务。  
    
-   5、guilin sprites
-   简写为 guilin cs
-   合并小图片命令，将指定目录下的所有小图片合并为sprites.png并精准计算其对应的background-position位置。
+   5、guilin sprites  
+   简写为 guilin cs  
+   合并小图片命令，将指定目录下的所有小图片合并为sprites.png并精准计算其对应的background-position位置。  
    
-   6、guilin stylelint
-   简写为 guilin sl
-   src/sass/*.scss进行检查，主要检查一些拼写错误
+   6、guilin stylelint  
+   简写为 guilin sl  
+   src/sass/*.scss进行检查，主要检查一些拼写错误  
    
-   7、guilin htmlhint
-   简写为 guilin hl
-   对html文件进行质量检查，并可保存页面快照截图
+   7、guilin htmlhint  
+   简写为 guilin hl  
+   对html文件进行质量检查，并可保存页面快照截图  
    
-   8、guilin help
-   简写为 guilin h
-   输出帮助信息
+   8、guilin help  
+   简写为 guilin h  
+   输出帮助信息  
 
 
 ## 三、配置说明
@@ -100,8 +108,7 @@
 - imgToBase64:false 将样式中的背景图片转为base64，默认为false
 - imgLimit:10 图片转换base64最大值，大于此值不转换，单位k
 - spritesWidth:500 小图合并后的sprites.png图的宽度
-- codeCheck: {
--  // 代码质量检查
+- codeCheck: { // 代码质量检查
 -   lintExclude: ['model', 'font', 'sprites'], // html代码检查时排除的目录
 -   screenshots: true, // 检查时是否拍照截图
 -   isMobile: false // 是否模拟手机端拍照截图，移动端项目时设为true}
