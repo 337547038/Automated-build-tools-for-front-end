@@ -38,10 +38,9 @@
 
    以上安装可参内容中的图片1.jpg。  
  ### 安装方法2：  
-安装在其他位置，例如将clone下来的文件放`D:\guilin`;   
-2.2、进入`D:\guilin`， 执行`npm install`命令安装依懒。  
-2.3、添加系统环境变量，添加`D:\guilin`  
-2.4、删除`guilin.cmd`,将`guilin.bak.cmd`重命名为`guilin.cmd`。  
+安装在其他位置，例如clone下来的文件位置`D:\Automated-build-tools-for-front-end`;   
+2.2、进入`D:\Automated-build-tools-for-front-end\guilin`， 执行`npm install`命令安装依懒。  
+2.3、添加系统环境变量，添加`D:\Automated-build-tools-for-front-end\guilin`    
 安装方法2可参考图2.jpg  
 
    目录下包含了static文件夹，guilin init初始化时会将目录下的文件复制到当前项目目录，因此可以将一些常用的脚本样式图片等放到对应的目录去，初始化时就不用再次复制了。
