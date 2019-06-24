@@ -191,7 +191,7 @@ function drawImage(imageList, ctx, canvas, configDist) {
 // 保存合并图片
 function savePng(len, canvas, configDist) {
   if (len === 0) {
-    const srcImage = './src/images';
+    const srcImage = './src/static/img';
     const pngName = '/sprites.png';
     const buildImage = srcImage.replace('src', configDist);
     const out = fs.createWriteStream(srcImage + pngName);

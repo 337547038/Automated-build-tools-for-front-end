@@ -9,7 +9,11 @@ const autoprefixer = require('autoprefixer');
 const postcss = require('postcss');
 /* 编辑css
  * path:单个文件路径时，编译当前。path=directory目录时，编译当前路径下所有不以_开头的 */
+let hasStatic = true; // 版本兼容，判断有没目录src/static
 module.exports = function (path, type) {
+  if (!fs.existsSync('src/static')) {
+    hasStatic = false // 版本兼容，不存在目录
+  }
   const config = JSON.parse(fs.readFileSync('./package.json'));
   if (path === 'directory') {
     // 目录时，侧编译sass目录下所有不以_开头的scss，仅处理一级目录
@@ -20,14 +24,20 @@ module.exports = function (path, type) {
       paths.forEach(function (src) {
         if (src.indexOf('_') !== 0) {
           // 不是以_开头
-          const dist = 'src/css/' + src.replace('.scss', '.css');
+          let dist = 'src/static/css/' + src.replace('.scss', '.css');
+          if (!hasStatic) {
+            dist = 'src/css/' + src.replace('.scss', '.css');
+          }
           // sassRender(outputStyle, dist, map, auto, type, 'src/sass/' + src)
           sassRender(config, dist, type, 'src/sass/' + src)
         }
       })
     })
   } else {
-    const dist = path.replace('/sass/', '/css/').replace('.scss', '.css');
+    let dist = path.replace('/sass/', '/static/css/').replace('.scss', '.css');
+    if (!hasStatic) {
+      dist = path.replace('/sass/', '/css/').replace('.scss', '.css');
+    }
     sassRender(config, dist, type, path)
   }
 };
@@ -63,18 +73,19 @@ function sassRender(config, dist, type, path) {
 
 /* 添加前缀 */
 function autoPreFixer(css, outPath, type, config, map, inputPath) {
+  css = css.replace(/..\/static/gi, '..');
   if (config.autoPreFixer) {
     //编译后再将样式添加兼容前缀时会去掉map信息，watch时追加回去。（暂没找到配置办法）
     let sourceMap = '';
     if (map) {
-      sourceMap = `\r\r/*# sourceMappingURL=${outPath.replace('./src/css/', '')}.map */`
+      sourceMap = `\r\r/*# sourceMappingURL=${outPath.replace('./src/static/css/', '')}.map */`
     }
     postcss([autoprefixer])
-      .process(css, {from: inputPath, to: outPath})
-      .then(result => {
-        // writeFiles(result.css + sourceMap, outPath, log)
-        imgToBase64(result.css + sourceMap, outPath, type, config)
-      })
+    .process(css, {from: inputPath, to: outPath})
+    .then(result => {
+      // writeFiles(result.css + sourceMap, outPath, log)
+      imgToBase64(result.css + sourceMap, outPath, type, config)
+    })
   } else {
     // writeFiles(css, outPath, log)
     imgToBase64(css, outPath, type, config, type)
@@ -84,7 +95,10 @@ function autoPreFixer(css, outPath, type, config, map, inputPath) {
 /* 图片转base64 */
 function imgToBase64(content, dist, type, config) {
   let log = type === 'watch';
-  const outPath = dist.replace('src/css', `${config.dist}/css`);
+  let outPath = dist.replace('src/static/css', `${config.dist}/static/css`);
+  if (!hasStatic) {
+    outPath = dist.replace('src/css', `${config.dist}/css`);
+  }
   if (config.imgToBase64) {
     const dataReplace = content.replace(/url\((.+?)\)/gi, function (matchs, m1) {
       // 检查图片存在

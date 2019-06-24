@@ -24,13 +24,13 @@
     .tips{margin-bottom: 10px;}
     /*demo-before*/
     .demo-before [class*="sprites-"]{line-height: 100%}
-    .demo-before [class*="sprites-"]:before{content: '';background-image: url(../images/sprites.png); display: inline-block;vertical-align: middle;}
+    .demo-before [class*="sprites-"]:before{content: '';background-image: url(../static/img/sprites.png); display: inline-block;vertical-align: middle;}
     {{demoBeforeStyle1}}
     /*demo-normal*/
-    .demo-normal [class*="sprites-"]{background-image: url(../images/sprites.png); display: inline-block; vertical-align: middle}
+    .demo-normal [class*="sprites-"]{background-image: url(../static/img/sprites.png); display: inline-block; vertical-align: middle}
     {{demoNormalStyle1}}
   </style>
-  <script src="../js/jquery-1.12.4.min.js"></script>
+  <script src="../static/js/jquery-1.12.4.min.js"></script>
   <script>
     $(function () {
       $('.tab li').click(function () {
@@ -57,7 +57,7 @@
       <div class="tips">跟字体图标用法一致</div>
       <pre class="css">
 [class*="sprites-"]{line-height: 100%}
-[class*="sprites-"]:before{content: '';background-image: url(../images/sprites.png); display: inline-block;vertical-align: middle;}
+[class*="sprites-"]:before{content: '';background-image: url(../img/sprites.png); display: inline-block;vertical-align: middle;}
 {{demoBeforeStyle2}}</pre>
       <div class="list">
         <ul>
@@ -67,7 +67,7 @@
     </div>
     <div class="tab-pane demo-normal">
       <pre class="css">
-[class*="sprites-"]{background-image: url(../images/sprites.png); display: inline-block; vertical-align: middle;}
+[class*="sprites-"]{background-image: url(../img/sprites.png); display: inline-block; vertical-align: middle;}
 {{demoNormalStyle2}}</pre>
       <div class="list">
         <ul>
@@ -78,7 +78,7 @@
     <div class="tab-pane demo-phone">
       <div class="tips">移动端使用rem或vw/vh等其它单位时，通过scss的function转换</div>
       <pre class="css">
-[class*="sprites-"]:before{background-image: url(../images/sprites.png); display: flex;align-items: center; vertical-align: middle;background-size: {{backgroundSize}}}
+[class*="sprites-"]:before{background-image: url(../img/sprites.png); display: flex;align-items: center; vertical-align: middle;background-size: {{backgroundSize}}}
 {{demoPhoneStyle1}}</pre>
       <div class="list">
         因需转换单位，这里不显示示例
