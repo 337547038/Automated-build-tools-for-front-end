@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Created by 337547038
  * 2019
  * https://github.com/337547038/Automated-build-tools-for-front-end
@@ -14,6 +14,7 @@ let config = {};
 let tempHtml = [];
 
 const searchHtmlFiles = async function () {
+  // const stratTime = new Date()
   console.time('usedTime');
   config = JSON.parse(fs.readFileSync('./package.json'));
   console.log(`Check path ./${config.dist}, Please wait...`);
@@ -26,32 +27,36 @@ const searchHtmlFiles = async function () {
     }
     const browser = await puppeteer.launch();
     const page = await browser.newPage();
-    page.setViewport({
-      width: 1920,
-      height: 720
-    });
     if (config.codeCheck.isMobile) {
       // 模拟手机
-      await page.emulate(iPhone);
       page.setViewport({
         width: 750,
         height: 1366
-      });
+      })
+      await page.emulate(iPhone);
+    } else {
+      page.setViewport({
+        width: 1920,
+        height: 720
+      })
     }
     const path = 'file:///' + process.cwd().replace(/\\/g, '/');
     // 遍历tempHtml，对所有页面拍照
     for (let i = 0; i < tempHtml.length; i++) {
       const item = tempHtml[i];
       const url = path + '/' + item;
+      const imgPath = savePath + '/' + item.replace(config.dist + "/", '').replace(/\//g, '-').replace('.html', '.png')
       await page.goto(url);
       await page.screenshot({
-        path: savePath + '/' + item.replace(config.dist + "/", '').replace(/\//g, '-').replace('.html', '.jpg'),
-        type: 'jpeg',
+        path: imgPath,
+        // type: 'jpeg',
         fullPage: true
       });
+      console.log(imgPath)
     }
     await browser.close();
     console.timeEnd('usedTime');
+    // console.log(new Date() - stratTime)
   }
 };
 
