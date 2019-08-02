@@ -7,7 +7,8 @@ const fs = require('fs');
 const htmlhint = require("htmlhint");
 // https://github.com/htmlhint/HTMLHint/wiki/Usage
 const puppeteer = require('puppeteer');
-const iPhone = puppeteer.devices['iPhone 8'];
+// https://github.com/GoogleChrome/puppeteer/blob/master/lib/DeviceDescriptors.js
+const iPhone = puppeteer.devices['iPhone X'];
 let pass = true;
 let timer = '';
 let config = {};
@@ -29,11 +30,11 @@ const searchHtmlFiles = async function () {
     const page = await browser.newPage();
     if (config.codeCheck.isMobile) {
       // 模拟手机
-      page.setViewport({
+      await page.emulate(iPhone);
+	  page.setViewport({
         width: 750,
         height: 1366
       })
-      await page.emulate(iPhone);
     } else {
       page.setViewport({
         width: 1920,
