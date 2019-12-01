@@ -23,14 +23,11 @@
     .list li span:nth-child(1){color: #999;}
     .tips{margin-bottom: 10px;}
     /*demo-before*/
-    .demo-before [class*="sprites-"]{line-height: 100%}
-    .demo-before [class*="sprites-"]:before{content: '';background-image: url(../static/img/sprites.png); display: inline-block;vertical-align: middle;}
     {{demoBeforeStyle1}}
     /*demo-normal*/
-    .demo-normal [class*="sprites-"]{background-image: url(../static/img/sprites.png); display: inline-block; vertical-align: middle}
     {{demoNormalStyle1}}
   </style>
-  <script src="../static/js/jquery-1.12.4.min.js"></script>
+  <script src="../js/jquery-1.12.4.min.js"></script>
   <script>
     $(function () {
       $('.tab li').click(function () {
@@ -56,8 +53,6 @@
     <div class="tab-pane demo-before active">
       <div class="tips">跟字体图标用法一致</div>
       <pre class="css">
-[class*="sprites-"]{line-height: 100%}
-[class*="sprites-"]:before{content: '';background-image: url(../img/sprites.png); display: inline-block;vertical-align: middle;}
 {{demoBeforeStyle2}}</pre>
       <div class="list">
         <ul>
@@ -67,7 +62,6 @@
     </div>
     <div class="tab-pane demo-normal">
       <pre class="css">
-[class*="sprites-"]{background-image: url(../img/sprites.png); display: inline-block; vertical-align: middle;}
 {{demoNormalStyle2}}</pre>
       <div class="list">
         <ul>
@@ -78,8 +72,7 @@
     <div class="tab-pane demo-phone">
       <div class="tips">移动端使用rem或vw/vh等其它单位时，通过scss的function转换</div>
       <pre class="css">
-[class*="sprites-"]:before{background-image: url(../img/sprites.png); display: flex;align-items: center; vertical-align: middle;background-size: {{backgroundSize}}}
-{{demoPhoneStyle1}}</pre>
+{{demoPhoneStyle}}</pre>
       <div class="list">
         因需转换单位，这里不显示示例
       </div>
@@ -89,11 +82,10 @@
   </div>
   <div class="intro">
     <h3>使用说明：</h3>
-    <p>1、将所有需要合并的图片放在目录./src/sprites/icons下；</p>
+    <p>1、将所有需要合并的图片放在目录./src/static/sprites；</p>
     <p>2、运行命令guilin sprites即可将所有指定的图片合并为sprites.png；新增图片时执行命令即可；</p>
     <p>3、仅支持jpg和png两种格式，并且不支持中文命名；</p>
-    <p>4、如需重新生成，请手动删除文件./src/sprites/icons.json后重执行合并命令，重新生成后图片位置会发生变化，请慎重</p>
-    <p>5、将红色样式复制到项目样式，在需显示图标位置添加对应class</p>
+    <p>4、引入生成样式或将红色样式复制到项目样式，在需显示图标位置添加对应class</p>
   </div>
 </div>
 </body>

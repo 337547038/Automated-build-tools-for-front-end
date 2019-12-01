@@ -8,7 +8,6 @@ const sass = require("./sass");
 const cache = require("./cache");
 const puppeteer = require("./puppeteer");
 const uglifyJS = require('./uglifyJS');
-const sprites = require('./sprites');
 const beautify = require('js-beautify');
 /* 复制文件或文件夹
 * src可以是一个文件路径，也可以是一个目录
@@ -52,11 +51,8 @@ function copyFile(src, dist, type, event) {
           if (event === 'change') {
             cache(src, type)
           }
-        } else if (src.indexOf('src/sprites') !== -1) {
-          // 精灵图文件夹，仅在icons里的图片文件变动时处理
-          if (src.indexOf('src/sprites/icons') !== -1 && type !== 'build') {
-            sprites(src)
-          }
+        } else if (src.indexOf('src/static/sprites') !== -1) {
+          // 精灵图文件夹，不处理
           // console.log('sprites:' + src)
         } else if (src.indexOf('.html') !== -1) {
           // 如果是html文件
@@ -180,7 +176,7 @@ function copyDirectory(src, dist, type, event) {
         }
         // 如果是目录则递归调用自身
         else if (st.isDirectory()) {
-          if (type !== 'init' && (newSrc.indexOf('src/sass') !== -1 || newSrc.indexOf('src/model') !== -1 || newSrc.indexOf('src/webpack') !== -1 || newSrc.indexOf('src/sprites') !== -1)) {
+          if (type !== 'init' && (newSrc.indexOf('src/sass') !== -1 || newSrc.indexOf('src/model') !== -1 || newSrc.indexOf('src/webpack') !== -1 || newSrc.indexOf('src/static/sprites') !== -1)) {
             // 不创建目录，但对里面的文件要进行复制
             copyDirectory(newSrc, newDist, type, event)
           } else {
