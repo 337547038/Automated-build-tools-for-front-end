@@ -102,12 +102,12 @@ function writeFile(tempArray) {
       const demoNormalStyle2 = demoBeforeStyle2.replace(/:before/g, '');
       demoPhoneStyle = demoPhoneStyle.replace(/{{backgroundSize}}/, `px(${canvasWidth}) px(${canvasHeight})`);
       data = data.replace(/{{total}}/, tempArray.length)
-        .replace(/{{demoContent}}/g, demoContent)
-        .replace(/{{demoBeforeStyle1}}/, demoBeforeStyle)
-        .replace(/{{demoBeforeStyle2}}/, demoBeforeStyle2)
-        .replace(/{{demoNormalStyle1}}/, demoNormalStyle)
-        .replace(/{{demoNormalStyle2}}/, demoNormalStyle2)
-        .replace(/{{demoPhoneStyle}}/, demoPhoneStyle);
+      .replace(/{{demoContent}}/g, demoContent)
+      .replace(/{{demoBeforeStyle1}}/, demoBeforeStyle)
+      .replace(/{{demoBeforeStyle2}}/, demoBeforeStyle2)
+      .replace(/{{demoNormalStyle1}}/, demoNormalStyle)
+      .replace(/{{demoNormalStyle2}}/, demoNormalStyle2)
+      .replace(/{{demoPhoneStyle}}/, demoPhoneStyle);
       const outPath = spritesPath + '/index.html';
       fs.writeFile(outPath, data, function (err) {
         if (err) throw err;
@@ -128,7 +128,17 @@ function writeFile(tempArray) {
         fs.createReadStream(outPath).pipe(fs.createWriteStream(dist))
       });
       // 生成一个css文件
-      let cssData = demoBeforeStyle2 + '\n/*常规引用css*/\n/*' + demoNormalStyle2 + '*/\n/*移动端*/\n/*' + demoPhoneStyle + '*/'
+      let beforeStyle = demoBeforeStyle2
+      if (config.codeCheck.isMobile) {
+        // 如果是移动应用端，则注释伪类引用，直接使用移动端
+        beforeStyle = '/*伪类引用*/\n/*' + demoBeforeStyle2 + '*/\n'
+      }
+      let mobileStyle = demoPhoneStyle
+      if (!config.codeCheck.isMobile) {
+        // 如果是移动应用端，则注释伪类引用，直接使用移动端
+        mobileStyle = '/*移动端*/\n/*' + demoPhoneStyle + '*/\n'
+      }
+      let cssData = beforeStyle + '\n/*常规引用css*/\n/*' + demoNormalStyle2 + '*/\n' + mobileStyle
       fs.writeFile('./src/sass/sprites.scss', cssData, function (err) {
         if (err) throw err;
         // 绿色
