@@ -56,7 +56,7 @@ function writeFile(tempArray) {
   const spacing = 5; // 两张图片间的间距
   let demoContent = '';
   let demoBeforeStyle = '.demo-before [class*="sprites-"]{line-height: 100%}\n.demo-before [class*="sprites-"]:before{content: \'\';background-image: url(../img/sprites.png); display: inline-block;vertical-align: middle;}\n';
-  let demoPhoneStyle = '[class*="sprites-"]:before{background-image: url(../img/sprites.png); display: flex;align-items: center; vertical-align: middle;background-size: {{backgroundSize}}}\n';
+  let demoPhoneStyle = '[class*="sprites-"]:before{content: \'\'；background-image: url(../img/sprites.png); display: inline-block; vertical-align: middle;background-size: {{backgroundSize}}}\n';
   // 读取配置信息
   const config = JSON.parse(fs.readFileSync('./package.json'));
   const canvasWidth = config.spritesWidth;
@@ -139,7 +139,7 @@ function writeFile(tempArray) {
         mobileStyle = '/*移动端*/\n/*' + demoPhoneStyle + '*/\n'
       }
       let cssData = beforeStyle + '\n/*常规引用css*/\n/*' + demoNormalStyle2 + '*/\n' + mobileStyle
-      fs.writeFile('./src/sass/sprites.scss', cssData, function (err) {
+      fs.writeFile('./src/sass/_sprites.scss', cssData, function (err) {
         if (err) throw err;
         // 绿色
         console.log('\x1B[32m%s\x1B[39m', `成功写入./src/sass/sprites.scss文件`);
