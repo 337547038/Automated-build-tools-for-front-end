@@ -5,14 +5,22 @@
  */
 const fs = require('fs');
 const {createCanvas, loadImage, Image} = require('canvas');
-let tempArray = []; // 所有图片信息
+let tempArray = []; // 当前新增图片信息
+let hasList = []; // 已有图片信息
 const spritesPath = './src/static/sprites';
-/*const icons = spritesPath + '/icons';
-const iconJson = spritesPath + '/icons.json';*/
+/*const icons = spritesPath + '/icons';*/
+const iconJson = spritesPath + '/icons.json';
 let timer = 0;
 const sprites = function () {
 //module.exports = function (path) {
   if (fs.existsSync(spritesPath)) {
+    if (fs.existsSync(iconJson)) {
+      try {
+        hasList = JSON.parse(fs.readFileSync(iconJson));
+      } catch (e) {
+        hasList = []
+      }
+    }
     // 目录时
     fs.readdir(spritesPath, function (err, paths) {
       if (err) {
@@ -20,15 +28,24 @@ const sprites = function () {
       }
       paths.forEach(function (src) {
         if (src.indexOf('.jpg') !== -1 || src.indexOf('.png') !== -1) {
-          const img = new Image();
-          img.onload = () => {
-            tempArray.push({
-              path: src,
-              width: img.width,
-              height: img.height
-            });
-          };
-          img.src = spritesPath + '/' + src // 不支持带有中文名称
+          let has = false;
+          // 图片已经存在于json时，不处理
+          hasList.forEach(item => {
+            if (item.path === src) {
+              has = true
+            }
+          });
+          if (!has) {
+            const img = new Image();
+            img.onload = () => {
+              tempArray.push({
+                path: src,
+                width: img.width,
+                height: img.height
+              });
+            };
+            img.src = spritesPath + '/' + src // 不支持带有中文名称
+          }
         }
       })
       writeFile(tempArray)
@@ -49,6 +66,8 @@ function writeFile(tempArray) {
     }
     return 0;
   });
+  // 合并两个数组
+  hasList.push.apply(hasList, tempArray);
   // 计算生成图的大小，宽固定为500
   let usedWidth = 0; // 当前列已使用宽度，换行时要回0
   let usedHeight = 0; // 当前使用高度
@@ -60,7 +79,7 @@ function writeFile(tempArray) {
   // 读取配置信息
   const config = JSON.parse(fs.readFileSync('./package.json'));
   const canvasWidth = config.spritesWidth;
-  tempArray.forEach(item => {
+  hasList.forEach(item => {
     if (item.width + usedWidth + spacing > canvasWidth) {
       // 要换行
       usedHeight += maxHeight + spacing;
@@ -102,12 +121,12 @@ function writeFile(tempArray) {
       const demoNormalStyle2 = demoBeforeStyle2.replace(/:before/g, '');
       demoPhoneStyle = demoPhoneStyle.replace(/{{backgroundSize}}/, `px(${canvasWidth}) px(${canvasHeight})`);
       data = data.replace(/{{total}}/, tempArray.length)
-        .replace(/{{demoContent}}/g, demoContent)
-        .replace(/{{demoBeforeStyle1}}/, demoBeforeStyle)
-        .replace(/{{demoBeforeStyle2}}/, demoBeforeStyle2)
-        .replace(/{{demoNormalStyle1}}/, demoNormalStyle)
-        .replace(/{{demoNormalStyle2}}/, demoNormalStyle2)
-        .replace(/{{demoPhoneStyle}}/, demoPhoneStyle);
+      .replace(/{{demoContent}}/g, demoContent)
+      .replace(/{{demoBeforeStyle1}}/, demoBeforeStyle)
+      .replace(/{{demoBeforeStyle2}}/, demoBeforeStyle2)
+      .replace(/{{demoNormalStyle1}}/, demoNormalStyle)
+      .replace(/{{demoNormalStyle2}}/, demoNormalStyle2)
+      .replace(/{{demoPhoneStyle}}/, demoPhoneStyle);
       const outPath = spritesPath + '/index.html';
       fs.writeFile(outPath, data, function (err) {
         if (err) throw err;
@@ -151,26 +170,33 @@ function writeFile(tempArray) {
   // 将图片输出
   const canvas = createCanvas(canvasWidth, canvasHeight);
   const ctx = canvas.getContext('2d');
-  drawImage(tempArray, ctx, canvas, config.dist)
+  drawImage(hasList, ctx, canvas, config.dist)
 }
 
 function drawImage(imageList, ctx, canvas, configDist) {
+  let notImg = []
   let len = imageList.length;
   imageList.forEach(item => {
     loadImage(spritesPath + '/' + item.path).then((image) => {
       ctx.drawImage(image, item.x, item.y, item.width, item.height);
       len--
       if (len === 0) {
-        savePng(canvas, configDist)
+        savePng(canvas, configDist, notImg)
       }
     }).catch(err => {
+      len--
+      if (len === 0) {
+        savePng(canvas, configDist, notImg)
+      }
+      notImg.push(err.path)
+      console.log(err.path)
     })
   })
 
 }
 
 // 保存合并图片
-function savePng(canvas, configDist) {
+function savePng(canvas, configDist, notImg) {
   const srcImage = './src/static/img';
   const pngName = '/sprites.png';
   const buildImage = srcImage.replace('src', configDist);
@@ -186,6 +212,18 @@ function savePng(canvas, configDist) {
   stream.pipe(out);
   stream.pipe(fs.createWriteStream(buildImage + pngName)); // 再复制到输出目录
   out.on('finish', () => console.log('The css sprites PNG file was created =>' + srcImage + pngName + ' and ' + buildImage + pngName))
+  // 更新icons.json
+  let notImgTips = ''
+  if (notImg.length > 0) {
+    notImgTips = ',' + notImg.length + '张图片不存在'
+  }
+  fs.writeFile(iconJson, JSON.stringify(hasList, null, 2), function (err) {
+    if (err) throw err;
+    console.log('\x1B[32m%s\x1B[39m', `本次需合并的icon图片共${hasList.length}个,其中新增${tempArray.length}个${notImgTips}`);
+    // 清空
+    tempArray = []
+  });
+
 }
 
 module.exports = sprites;
