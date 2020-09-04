@@ -9,7 +9,7 @@
     "commander": "^2.20.0",
     "htmlhint": "^0.11.0",
     "js-beautify": "^1.10.0",
-    "node-sass": "^4.12.0",
+    "node-sass": "^4.13.1",
     "postcss": "^7.0.16",
     "puppeteer": "^1.17.0",
     "stylelint": "^10.0.1",
